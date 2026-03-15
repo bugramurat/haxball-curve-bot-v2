@@ -3,7 +3,7 @@ Haxball curve bot (adjustable direction) with slider-bar (also including Lob-sho
 <br><br>
 
 ## Preview
-![preview](https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExb3VhNnp1ZzI5djUycXU0NDY5ZzRpNXBmeTJpcmV1b21xcG5oNzlnayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0ybbkT6wrH94PYXFNV/giphy.gif)
+![preview](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZXhrbG9scDRpc3NmYWJnaDA3end1cjVubGlhdTRzMnJ1dzMxcnJ0ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mO40h6GBqq7TmuxOTf/giphy.gif)
 
 ## How to run
 Run this to **download** this project *(or download manually and go to your project-folder path)*:
@@ -18,7 +18,7 @@ npm install node-haxball
 ```
 **Paste your token** while executing *curve_bot_v2.js* file in your cmd and run the bot *(https://www.haxball.com/headlesstoken)*:
 ```
-node curve_bot.js HEADLESS_TOKEN
+node curve_bot_v2.js HEADLESS_TOKEN
 ```
 <br><br>
 Type **!claim** in your Haxball room to claim admin.
