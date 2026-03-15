@@ -1,5 +1,5 @@
 # Haxball Curve Bot v2
-Haxball curve bot with slider-bar (Also including Lob-shot, Power-shot, Controllable-shot and Slide/Sprint abilities) with node-haxball API.
+Haxball curve bot (adjustable direction) with slider-bar (also including Lob-shot, Power-shot, Controllable-shot and Slide/Sprint abilities) with node-haxball API.
 <br><br>
 
 ## Preview
@@ -23,17 +23,19 @@ node curve_bot.js HEADLESS_TOKEN
 <br><br>
 Type **!claim** in your Haxball room to claim admin.
 <br><br><br><br>
-(You can adjust your room's name and other settings in *curve_bot_v2.js* file. You can use this bot with custom maps but you must create **extra discs and their joints** for *slider-bar* and arrange their **ID's** in *curve_bot_v2.js* file.)
+(You can adjust your room's name and other settings in curve_bot_v2.js file. You can use this bot with custom maps but you must create extra discs and their joints for slider-bar and arrange their ID's in curve_bot_v2.js file.)
 
-## Abilities
-- CURVE: Curved-shot until bar fills, hard-power-shot with fulfilled bar, Controllable-shot when ball is blue.
-- LOB-SHOT: Lob-shot until bar fills, curved-lob-shot with fulfilled (triangle) bar (simply cross with curve).
-- AUTO-POWER-SHOT: Auto-power-shot when you facing towards to opponent goal and enough close to it.
-- CONTROLLABLE-SHOT: Dribble ball in Curve mode until ball turns to blue, after shooting control the ball with arrow-keys.
-<br><br>
+## Features
+- Adjustable curve direction
+- Lob-shot
+- Power-shot
+- Controllable-shot
+- Slide / Sprint abilities
+
+Dribble for **Curve, Lob-shot,** and **Auto-power-shot**. You can adjust your curve direction by positioning yourself towards to ball. In Curve mode, when the bar fills, you can perform a **Hard-power-shot**, and when the ball turns blue, you can perform an **Controllable-shot** where you can control the ball with your arrow keys while it moves. Since no one can touch the ball during a Lob, it won't be a goal until the ball lands. For **Slide**, hold X and release when your avatar's shoe appears; for **Sprint**, hold X without releasing. Toggle **OP mode** to sprint like Flash.
+
+
 You can choose your shot-modes in game, **every player has their own shot-modes.** Also every player can turn on/off their slide abilities and their op modes.
-<br><br>
-Dribble for **Curve, Lob-shot,** and **Auto-power-shot**. In Curve mode, when the bar fills, you can perform a **Hard-power-shot**, and when the ball turns blue, you can perform an **Controllable-shot** where you can control the ball while it moves. Since no one can touch the ball during a Lob, it won't be a goal until the ball lands. For **Slide**, hold X and release when your avatar's shoe appears; for **Sprint**, hold X without releasing. Toggle **OP mode** to sprint like Flash.
 
 
 ## Libraries
