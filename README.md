@@ -1,4 +1,4 @@
-# Haxball Curve Bot
+# Haxball Curve Bot v2
 Haxball curve bot with slider-bar (Also including Lob-shot, Power-shot, Controllable-shot and Slide/Sprint abilities) with node-haxball API.
 <br><br>
 You can use this bot with custom maps but you must create **extra discs and their joints** for *slider-bar* and arrange their **ID's** in *curve_bot_v2.js* file.
