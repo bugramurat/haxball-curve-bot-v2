@@ -33,7 +33,7 @@ Type **!claim** in your Haxball room to claim admin.
 <br><br>
 You can choose your shot-modes in game, **every player has their own shot-modes.** Also every player can turn on/off their slide abilities.
 <br><br>
-Dribble for **Curve, Lob-shot,** and **Auto-power-shot**. In Curve mode, when the bar fills, you can perform a **Hard-power-shot**, and when the ball turns blue, you can perform an **Controllable-shot** where you can control the ball while it moves. Since no one can touch the ball during a Lob, it won't be a goal until the ball lands. For **Slide**, hold X and release when your avatar's shoe appears; for **Sprint**, hold X without releasing. Toggle OP mode to sprint like Flash.
+Dribble for **Curve, Lob-shot,** and **Auto-power-shot**. In Curve mode, when the bar fills, you can perform a **Hard-power-shot**, and when the ball turns blue, you can perform an **Controllable-shot** where you can control the ball while it moves. Since no one can touch the ball during a Lob, it won't be a goal until the ball lands. For **Slide**, hold X and release when your avatar's shoe appears; for **Sprint**, hold X without releasing. Toggle **OP mode** to sprint like Flash.
 
 
 ## Libraries
