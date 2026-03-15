@@ -1,6 +1,30 @@
 // BUGGYRAZ
-const { OperationType, VariableType, ConnectionState, AllowFlags, Direction, CollisionFlags, CameraFollow, BackgroundType, GamePlayState, BanEntryType, Callback, Utils, Room, Replay, Query, Library, RoomConfig, Plugin, Renderer, Errors, Language, EventFactory, Impl } = require('node-haxball')()
-const fs = require('fs')
+const {
+  OperationType,
+  VariableType,
+  ConnectionState,
+  AllowFlags,
+  Direction,
+  CollisionFlags,
+  CameraFollow,
+  BackgroundType,
+  GamePlayState,
+  BanEntryType,
+  Callback,
+  Utils,
+  Room,
+  Replay,
+  Query,
+  Library,
+  RoomConfig,
+  Plugin,
+  Renderer,
+  Errors,
+  Language,
+  EventFactory,
+  Impl,
+} = require("node-haxball")()
+const fs = require("fs")
 
 /*
  ▄████▄   ▒█████   ███▄    █   █████▒██▓  ▄████
@@ -17,7 +41,7 @@ const fs = require('fs')
 //------------------------ ROOM CONFIG -----------------------------------------
 const HEADLESS_TOKEN = process.argv[2] // 0 = node, 1 = index.js, 2 = token (https://www.haxball.com/headlesstoken)
 
-const EMO = '🍉'
+const EMO = "🍉"
 const ROOM_NAME = `${EMO} 🟢 FUT X4 • CURVE • LOB-SHOT 🟢`
 const MAX_PLAYER_NUMBER = 12
 
@@ -27,39 +51,75 @@ const SCORE_LIMIT = 0
 let needToLockTeams = true
 
 const testGE = true // Leave true if you want to see a cool goal effect
-let GOAL_TEXT = 'HELLYEAH'
+let GOAL_TEXT = "HELLYEAH"
 
 //------------------------ KIT CONFIG -----------------------------------------
 const kitsInfo =
-  '[0] City, [1] Real (Alt), [2] Fener, [3] Galata, [4] Beşiktaş, [5] Kocaeli, [6] Barça, [7] Manu, [8] Inter, [9] Paris, [10] Miami, [11] Al Nassr, [12] Milan, [13] Liverpool, [14] Dortmund, [15] Chelsea, [16] Juventus, [17] Leverkusen, [18] Roma, [19] Bursa, [20] Spain, [21] Portugal, [22] Spain (A), [23] Eyüp, [24] Paris (A), [25] Real (Alt2), [26] Real' // VIP's can see this with !s or !shirts command
+  "[0] City, [1] Real (Alt), [2] Fener, [3] Galata, [4] Beşiktaş, [5] Kocaeli, [6] Barça, [7] Manu, [8] Inter, [9] Paris, [10] Miami, [11] Al Nassr, [12] Milan, [13] Liverpool, [14] Dortmund, [15] Chelsea, [16] Juventus, [17] Leverkusen, [18] Roma, [19] Bursa, [20] Spain, [21] Portugal, [22] Spain (A), [23] Eyüp, [24] Paris (A), [25] Real (Alt2), [26] Real" // VIP's can see this with !s or !shirts command
 const dbKits = [
-  [{ t: '⛵CITY' }, { a: 90, c0: 0xffffff, c1: 0x4dc9ff, c2: 0x1da6e0 }],
-  [{ t: '👑REAL (ALT)' }, { a: 90, c0: 0x000000, c1: 0xffa200, c2: 0xffa200 }],
-  [{ t: '🐤FB' }, { a: 0, c0: 0xffffff, c1: 0xffed00, c2: 0x163962, c3: 0xffed00 }],
-  [{ t: '🦁GS' }, { a: 600, c0: 0x000000, c1: 0xa90432, c2: 0xfdb912 }],
-  [{ t: '🦅BJK' }, { a: 0, c0: 0xff0000, c1: 0xffffff, c2: 0x000000, c3: 0xffffff }],
-  [{ t: '🏞️KOCAELİ' }, { a: 0, c0: 0xffffff, c1: 0x008f39, c2: 0x000000, c3: 0x008f39 }],
-  [{ t: '🏐BARÇA' }, { a: 0, c0: 0xedbb00, c1: 0x004d98, c2: 0xdb0030 }],
-  [{ t: '🔱MANU' }, { a: 0, c0: 0xffffff, c1: 0xda291c }],
-  [{ t: '⚽INTER' }, { a: 0, c0: 0xffffff, c1: 0x010e80, c2: 0x000000, c3: 0x010e80 }],
-  [{ t: '🗼PSG' }, { a: 0, c0: 0xffffff, c1: 0x004170, c2: 0xda291c, c3: 0x004170 }],
-  [{ t: '🌴MIAMI' }, { a: 0, c0: 0x231f20, c1: 0xf7b5cd }],
-  [{ t: '🐪AL NASSR' }, { a: 0, c0: 0x0048a0, c1: 0xfedd00 }],
-  [{ t: '🔴MILAN' }, { a: 0, c0: 0xffffff, c1: 0xfb090b, c2: 0x000000, c3: 0xfb090b }],
-  [{ t: '🐦‍🔥LIVERPOOL' }, { a: 90, c0: 0xffffff, c1: 0xc8102e, c2: 0xb30e29 }],
-  [{ t: '🐝DORTMUND' }, { a: 45, c0: 0xffffff, c1: 0xfde100, c2: 0x000000, c3: 0xfde100 }],
-  [{ t: '🥶CHELSEA' }, { a: 0, c0: 0xffffff, c1: 0x034694 }],
-  [{ t: '🦓JUVENTUS' }, { a: 0, c0: 0x757575, c1: 0xffffff, c2: 0x000000 }],
-  [{ t: '💊LEVERKUSEN' }, { a: 45, c0: 0x8a1514, c1: 0x000000, c2: 0xe32221, c3: 0x000000 }],
-  [{ t: '🏛️ROMA' }, { a: 45, c0: 0xf0bc42, c1: 0x8e1f2f }],
-  [{ t: '🐊BURSA' }, { a: 0, c0: 0xffffff, c1: 0xdbdbdb, c2: 0x007738, c3: 0xdbdbdb }],
-  [{ t: '💃🏽SPAIN' }, { a: 0, c0: 0xf9c705, c1: 0xf63a3e }],
-  [{ t: '🚋PORTUGAL' }, { a: 60, c0: 0xfcb507, c1: 0xe42518, c2: 0x0d6938 }],
-  [{ t: '💃🏽SPAIN (AWAY)' }, { a: 0, c0: 0xe73e34, c1: 0xf7f4bc }],
-  [{ t: '🕌EYÜP' }, { a: 0, c0: 0x3a2a4d, c1: 0xf4d800, c2: 0x6e5092, c3: 0xf4d800 }],
-  [{ t: '🗼PSG (AWAY)' }, { a: 60, c0: 0x871911, c1: 0xffffff, c2: 0xda291c, c3: 0xffffff }],
-  [{ t: '👑REAL (ALT 2)' }, { a: 90, c0: 0xffffff, c1: 0x7851a9, c2: 0x7851a9 }],
-  [{ t: '👑REAL' }, { a: 90, c0: 0xfebe10, c1: 0xffffff, c2: 0xffffff }],
+  [{ t: "⛵CITY" }, { a: 90, c0: 0xffffff, c1: 0x4dc9ff, c2: 0x1da6e0 }],
+  [{ t: "👑REAL (ALT)" }, { a: 90, c0: 0x000000, c1: 0xffa200, c2: 0xffa200 }],
+  [
+    { t: "🐤FB" },
+    { a: 0, c0: 0xffffff, c1: 0xffed00, c2: 0x163962, c3: 0xffed00 },
+  ],
+  [{ t: "🦁GS" }, { a: 600, c0: 0x000000, c1: 0xa90432, c2: 0xfdb912 }],
+  [
+    { t: "🦅BJK" },
+    { a: 0, c0: 0xff0000, c1: 0xffffff, c2: 0x000000, c3: 0xffffff },
+  ],
+  [
+    { t: "🏞️KOCAELİ" },
+    { a: 0, c0: 0xffffff, c1: 0x008f39, c2: 0x000000, c3: 0x008f39 },
+  ],
+  [{ t: "🏐BARÇA" }, { a: 0, c0: 0xedbb00, c1: 0x004d98, c2: 0xdb0030 }],
+  [{ t: "🔱MANU" }, { a: 0, c0: 0xffffff, c1: 0xda291c }],
+  [
+    { t: "⚽INTER" },
+    { a: 0, c0: 0xffffff, c1: 0x010e80, c2: 0x000000, c3: 0x010e80 },
+  ],
+  [
+    { t: "🗼PSG" },
+    { a: 0, c0: 0xffffff, c1: 0x004170, c2: 0xda291c, c3: 0x004170 },
+  ],
+  [{ t: "🌴MIAMI" }, { a: 0, c0: 0x231f20, c1: 0xf7b5cd }],
+  [{ t: "🐪AL NASSR" }, { a: 0, c0: 0x0048a0, c1: 0xfedd00 }],
+  [
+    { t: "🔴MILAN" },
+    { a: 0, c0: 0xffffff, c1: 0xfb090b, c2: 0x000000, c3: 0xfb090b },
+  ],
+  [{ t: "🐦‍🔥LIVERPOOL" }, { a: 90, c0: 0xffffff, c1: 0xc8102e, c2: 0xb30e29 }],
+  [
+    { t: "🐝DORTMUND" },
+    { a: 45, c0: 0xffffff, c1: 0xfde100, c2: 0x000000, c3: 0xfde100 },
+  ],
+  [{ t: "🥶CHELSEA" }, { a: 0, c0: 0xffffff, c1: 0x034694 }],
+  [{ t: "🦓JUVENTUS" }, { a: 0, c0: 0x757575, c1: 0xffffff, c2: 0x000000 }],
+  [
+    { t: "💊LEVERKUSEN" },
+    { a: 45, c0: 0x8a1514, c1: 0x000000, c2: 0xe32221, c3: 0x000000 },
+  ],
+  [{ t: "🏛️ROMA" }, { a: 45, c0: 0xf0bc42, c1: 0x8e1f2f }],
+  [
+    { t: "🐊BURSA" },
+    { a: 0, c0: 0xffffff, c1: 0xdbdbdb, c2: 0x007738, c3: 0xdbdbdb },
+  ],
+  [{ t: "💃🏽SPAIN" }, { a: 0, c0: 0xf9c705, c1: 0xf63a3e }],
+  [{ t: "🚋PORTUGAL" }, { a: 60, c0: 0xfcb507, c1: 0xe42518, c2: 0x0d6938 }],
+  [{ t: "💃🏽SPAIN (AWAY)" }, { a: 0, c0: 0xe73e34, c1: 0xf7f4bc }],
+  [
+    { t: "🕌EYÜP" },
+    { a: 0, c0: 0x3a2a4d, c1: 0xf4d800, c2: 0x6e5092, c3: 0xf4d800 },
+  ],
+  [
+    { t: "🗼PSG (AWAY)" },
+    { a: 60, c0: 0x871911, c1: 0xffffff, c2: 0xda291c, c3: 0xffffff },
+  ],
+  [
+    { t: "👑REAL (ALT 2)" },
+    { a: 90, c0: 0xffffff, c1: 0x7851a9, c2: 0x7851a9 },
+  ],
+  [{ t: "👑REAL" }, { a: 90, c0: 0xfebe10, c1: 0xffffff, c2: 0xffffff }],
 ]
 let homeTeam = Math.floor(Math.random() * dbKits.length)
 let awayTeam
@@ -74,7 +134,7 @@ let ENABLE_BANANA = true
 let ENABLE_POW_AND_ULTI = true
 
 //------------------------ STADIUM CONFIG -----------------------------------------
-const STADIUM_PATH_F = 'fx4.hbs' // Make sure your custom stadium have enough discs for slider-bar
+const STADIUM_PATH_F = "fx4.hbs" // Make sure your custom stadium have enough discs for slider-bar
 
 /*
     ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -102,18 +162,18 @@ console.log = function (...args) {
 
 */
 var stadiumF
-fs.readFile(STADIUM_PATH_F, 'utf8', (err, data) => {
+fs.readFile(STADIUM_PATH_F, "utf8", (err, data) => {
   if (err) {
-    console.error('Error reading the file:', err)
+    console.error("Error reading the file:", err)
     return
   }
   stadiumF = JSON.parse(data)
 })
 let stadiumWidth = 900
-const emojiAtt = '⚠️'
-const emojiQuest = '❓'
-const emojiInfo = 'ℹ️'
-const emojiSucces = '✅'
+const emojiAtt = "⚠️"
+const emojiQuest = "❓"
+const emojiInfo = "ℹ️"
+const emojiSucces = "✅"
 const colorAtt = 0xf6de16
 const colorInfo = 0x00ffff
 const colorSucces = 0x66ff00
@@ -145,19 +205,31 @@ function getTeamCounts(room) {
 function convertSecondsToTime(seconds) {
   const minutes = Math.floor(seconds / 60) // Get the number of minutes
   const remainingSeconds = Math.floor(seconds % 60) // Truncate decimals from remaining seconds
-  const formattedTime = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}` // Format as "MM:SS"
+  const formattedTime = `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}` // Format as "MM:SS"
   return formattedTime
 }
 function sendAnnoOnJoin(playerId, room) {
   setTimeout(() => {
-    room.sendAnnouncement(helpString, playerId, colorSucces, 'bold', NotifSound.NONE)
+    room.sendAnnouncement(
+      helpString,
+      playerId,
+      colorSucces,
+      "bold",
+      NotifSound.NONE,
+    )
   }, 1200)
-  room.sendAnnouncement(discordString, playerId, colorDiscord, 'bold', NotifSound.NONE)
+  room.sendAnnouncement(
+    discordString,
+    playerId,
+    colorDiscord,
+    "bold",
+    NotifSound.NONE,
+  )
 }
 let annoTimer = null
 function sendAnnos(room) {
   if (annoList.length === 0) {
-    console.error('Duyuru listesi boş!')
+    console.error("Duyuru listesi boş!")
     return
   }
   if (annoTimer !== null) return
@@ -165,9 +237,27 @@ function sendAnnos(room) {
     const anno = annoList[annoIndex]
     const annoString = anno.s
     const annoColor = anno.c
-    room.sendAnnouncement(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, null, annoColor, 'bold', NotifSound.NONE)
-    room.sendAnnouncement(`${annoString}`, null, annoColor, 'bold', NotifSound.NONE)
-    room.sendAnnouncement(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, null, annoColor, 'bold', NotifSound.NONE)
+    room.sendAnnouncement(
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      null,
+      annoColor,
+      "bold",
+      NotifSound.NONE,
+    )
+    room.sendAnnouncement(
+      `${annoString}`,
+      null,
+      annoColor,
+      "bold",
+      NotifSound.NONE,
+    )
+    room.sendAnnouncement(
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      null,
+      annoColor,
+      "bold",
+      NotifSound.NONE,
+    )
     annoIndex = (annoIndex + 1) % annoList.length
     annoTimer = setTimeout(loop, 3 * 60 * 1000)
   }
@@ -226,7 +316,17 @@ let allResetted = false
 let velocity = { xspeed: 0, yspeed: 0 }
 let fixedBarFirstVis = false
 let fixedBarPowerVis = false
-let cf = { kick: 64, score: 128, ball: 193, red: 2, blue: 4, c0: 268435456, c1: 536870912, c2: 1073741824, c3: -2147483648 }
+let cf = {
+  kick: 64,
+  score: 128,
+  ball: 193,
+  red: 2,
+  blue: 4,
+  c0: 268435456,
+  c1: 536870912,
+  c2: 1073741824,
+  c3: -2147483648,
+}
 const firstTimeThreshold = 0.35
 const powerTimeThreshold = 2.25
 const powerLobTimeThreshold = 2.25
@@ -246,7 +346,13 @@ function handleLobShotState(room) {
     if (!IS_ANY_ACTIVE_EFFECT) {
       resetLobShotState() // Stop the curve
       Utils.runAfterGameTick(() => {
-        room.setDiscProperties(0, { radius: normalBallRadius, cGroup: cf.ball, damping: 0.99, xgravity: 0, ygravity: 0 }) // Check if the ball's speed or direction has changed abruptly
+        room.setDiscProperties(0, {
+          radius: normalBallRadius,
+          cGroup: cf.ball,
+          damping: 0.99,
+          xgravity: 0,
+          ygravity: 0,
+        }) // Check if the ball's speed or direction has changed abruptly
       })
       return
     } else {
@@ -255,17 +361,25 @@ function handleLobShotState(room) {
         resetLobShotState()
         IS_ANY_ACTIVE_EFFECT = false
         Utils.runAfterGameTick(() => {
-          room.setDiscProperties(0, { radius: normalBallRadius, cGroup: cf.ball, damping: 0.99, xgravity: 0, ygravity: 0 })
+          room.setDiscProperties(0, {
+            radius: normalBallRadius,
+            cGroup: cf.ball,
+            damping: 0.99,
+            xgravity: 0,
+            ygravity: 0,
+          })
         })
         return
       }
       const z = 4 * peakHeight * progress * (1 - progress)
-      const scaledRadius = normalBallRadius + (z / peakHeight) * (peakScale - normalBallRadius)
+      const scaledRadius =
+        normalBallRadius + (z / peakHeight) * (peakScale - normalBallRadius)
       const b = room.getBall(true)
       Utils.runAfterGameTick(() => {
         room.setDiscProperties(0, { damping: 0.994, radius: scaledRadius })
         setTimeout(() => {
-          if (IS_ANY_ACTIVE_EFFECT && lobShotState.isLobShot) room.setDiscProperties(0, { cGroup: cf.c3 })
+          if (IS_ANY_ACTIVE_EFFECT && lobShotState.isLobShot)
+            room.setDiscProperties(0, { cGroup: cf.c3 })
         }, 75)
       })
     }
@@ -274,7 +388,15 @@ function handleLobShotState(room) {
     IS_ANY_ACTIVE_EFFECT = false
     const bs = room.getBall(true).speed
     Utils.runAfterGameTick(() => {
-      room.setDiscProperties(0, { radius: normalBallRadius, cGroup: cf.ball, damping: 0.99, xgravity: 0, ygravity: 0, xspeed: bs.x * 0.8, yspeed: bs.y * 0.8 })
+      room.setDiscProperties(0, {
+        radius: normalBallRadius,
+        cGroup: cf.ball,
+        damping: 0.99,
+        xgravity: 0,
+        ygravity: 0,
+        xspeed: bs.x * 0.8,
+        yspeed: bs.y * 0.8,
+      })
     })
     return
   }
@@ -304,7 +426,8 @@ function resetSSS(room) {
 }
 function handleSprintState(player, room) {
   const now = Date.now()
-  const isSpeedThresholdOkay = Math.abs(player.disc.speed.x) + Math.abs(player.disc.speed.y) >= 0.5
+  const isSpeedThresholdOkay =
+    Math.abs(player.disc.speed.x) + Math.abs(player.disc.speed.y) >= 0.5
   const gravityMap = {
     17: { ygravity: -0.06 },
     29: { ygravity: -0.06 },
@@ -344,32 +467,40 @@ function handleSprintState(player, room) {
     player.lastSprintDur = now - player.sprintStartTime
     player.lastSprintTime = now
     player.isSprinting = false
-    if ((!player.vip || !player.ca) && player.pos != 0) room.setPlayerAvatar(player.id, String(player.pos), true)
+    if ((!player.vip || !player.ca) && player.pos != 0)
+      room.setPlayerAvatar(player.id, String(player.pos), true)
     else if (player.ca) room.setPlayerAvatar(player.id, player.ca, true)
     else room.setPlayerAvatar(player.id, player.avatar, true)
     Utils.runAfterGameTick(() => {
       room.setPlayerDiscProperties(player.id, { xgravity: 0, ygravity: 0 })
     })
     player.sprintStartTime = null
-    room.setPlayerAvatar(player.id, '⌛', true)
+    room.setPlayerAvatar(player.id, "⌛", true)
     setTimeout(
       () => {
         if (player.isSprinting) return
-        room.setPlayerAvatar(player.id, '🔋', true)
+        room.setPlayerAvatar(player.id, "🔋", true)
         setTimeout(() => {
           if (player.isSprinting) return
-          if ((!player.vip || !player.ca) && player.pos != 0) room.setPlayerAvatar(player.id, String(player.pos), true)
+          if ((!player.vip || !player.ca) && player.pos != 0)
+            room.setPlayerAvatar(player.id, String(player.pos), true)
           else if (player.ca) room.setPlayerAvatar(player.id, player.ca, true)
           else room.setPlayerAvatar(player.id, player.avatar, true)
         }, 500)
       },
-      player.lastSprintDur * (player.pos === 7 || player.pos === 11 ? CDSprintDurXWingers : CDSprintDurX),
+      player.lastSprintDur *
+        (player.pos === 7 || player.pos === 11
+          ? CDSprintDurXWingers
+          : CDSprintDurX),
     )
   }
 }
 function handleSlideFriction(player, room) {
   Utils.runAfterGameTick(async () => {
-    room.setPlayerDiscProperties(player.id, { xspeed: player.disc.speed.x * 0.9, yspeed: player.disc.speed.y * 0.9 })
+    room.setPlayerDiscProperties(player.id, {
+      xspeed: player.disc.speed.x * 0.9,
+      yspeed: player.disc.speed.y * 0.9,
+    })
   })
 }
 let firstSlideLineTime = null
@@ -418,7 +549,11 @@ function handleSlideState(player, room) {
     }
     Utils.runAfterGameTick(() => {
       room.setPlayerDiscProperties(player.id, props)
-      if (firstSlideLineTime === null || (secondSlideLineTime != null && firstSlideLineTime < secondSlideLineTime)) {
+      if (
+        firstSlideLineTime === null ||
+        (secondSlideLineTime != null &&
+          firstSlideLineTime < secondSlideLineTime)
+      ) {
         room.setDiscProperties(96, line1Start)
         room.setDiscProperties(97, line1End)
         room.setDiscProperties(98, line2Start)
@@ -441,7 +576,7 @@ function handleSlideState(player, room) {
   }, 100)
   setTimeout(() => {
     player.slideStartTime = null
-    room.setPlayerAvatar(player.id, '⌛', true)
+    room.setPlayerAvatar(player.id, "⌛", true)
     player.CDForSlide = true
     player.isSlideFriction = true
     player.isSliding = false
@@ -452,43 +587,96 @@ function handleSlideState(player, room) {
       () => {
         player.CDForSlide = false
         if (player.isSliding) return
-        room.setPlayerAvatar(player.id, '🔋', true)
+        room.setPlayerAvatar(player.id, "🔋", true)
         setTimeout(() => {
           if (player.isSliding) return
-          if ((!player.vip || !player.ca) && player.pos != 0) room.setPlayerAvatar(player.id, String(player.pos), true)
+          if ((!player.vip || !player.ca) && player.pos != 0)
+            room.setPlayerAvatar(player.id, String(player.pos), true)
           else if (player.ca) room.setPlayerAvatar(player.id, player.ca, true)
           else room.setPlayerAvatar(player.id, player.avatar, true)
         }, 500)
       },
-      (player.pos === 1 || player.pos === 4 || player.pos === 5 ? CDSlideDurDefenders : CDSlideDur) * 1000,
+      (player.pos === 1 || player.pos === 4 || player.pos === 5
+        ? CDSlideDurDefenders
+        : CDSlideDur) * 1000,
     )
   }, 400)
 }
 function handleKickState(player, room) {
   const now = Date.now()
-  const holdDuration = player.pressingXStartTime ? now - player.pressingXStartTime : 0
-  const isCoolDownDoneSlide = player.lastSlideTime ? now - player.lastSlideTime > (player.pos === 1 || player.pos === 4 || player.pos === 5 ? CDSlideDurDefenders : CDSlideDur) * 1000 : true
-  const isCoolDownDoneSprint = player.lastSprintTime ? now - player.lastSprintTime > player.lastSprintDur * (player.pos === 7 || player.pos === 11 ? CDSprintDurXWingers : CDSprintDurX) : true
-  const isSpeedThresholdOkay = Math.abs(player.disc.speed.x) + Math.abs(player.disc.speed.y) >= 0.5
+  const holdDuration = player.pressingXStartTime
+    ? now - player.pressingXStartTime
+    : 0
+  const isCoolDownDoneSlide = player.lastSlideTime
+    ? now - player.lastSlideTime >
+      (player.pos === 1 || player.pos === 4 || player.pos === 5
+        ? CDSlideDurDefenders
+        : CDSlideDur) *
+        1000
+    : true
+  const isCoolDownDoneSprint = player.lastSprintTime
+    ? now - player.lastSprintTime >
+      player.lastSprintDur *
+        (player.pos === 7 || player.pos === 11
+          ? CDSprintDurXWingers
+          : CDSprintDurX)
+    : true
+  const isSpeedThresholdOkay =
+    Math.abs(player.disc.speed.x) + Math.abs(player.disc.speed.y) >= 0.5
   if (!(holdDuration === 0 && player.isKicking)) player.lhd = holdDuration
-  if (player.isKicking && !player.isSliding && holdDuration >= 1600 && isSpeedThresholdOkay && isCoolDownDoneSlide && isCoolDownDoneSprint) {
+  if (
+    player.isKicking &&
+    !player.isSliding &&
+    holdDuration >= 1600 &&
+    isSpeedThresholdOkay &&
+    isCoolDownDoneSlide &&
+    isCoolDownDoneSprint
+  ) {
     player.isSprinting = true
     player.sprintStartTime = now
-    room.setPlayerAvatar(player.id, '⚡', true)
-  } else if (player.es && player.isKicking && holdDuration === 0 && !player.isSprinting && player.lhd >= 600 && isSpeedThresholdOkay && isCoolDownDoneSlide && isCoolDownDoneSprint) {
+    room.setPlayerAvatar(player.id, "⚡", true)
+  } else if (
+    player.es &&
+    player.isKicking &&
+    holdDuration === 0 &&
+    !player.isSprinting &&
+    player.lhd >= 600 &&
+    isSpeedThresholdOkay &&
+    isCoolDownDoneSlide &&
+    isCoolDownDoneSprint
+  ) {
     player.isSliding = true
     player.slideStartTime = now
-    room.setPlayerAvatar(player.id, '💨', true)
+    room.setPlayerAvatar(player.id, "💨", true)
     handleSlideState(player, room)
-  } else if (player.es && player.isKicking && !player.isSliding && !player.isSprinting && holdDuration >= 600 && isSpeedThresholdOkay && isCoolDownDoneSlide && isCoolDownDoneSprint) {
-    room.setPlayerAvatar(player.id, '👟', true)
-  } else if (isCoolDownDoneSlide && isCoolDownDoneSprint && (player.headlessAvatar === '👟' || player.headlessAvatar === '💨' || player.headlessAvatar === '⚡' || player.headlessAvatar === '🔋' || player.headlessAvatar === '⌛')) {
-    if ((!player.vip || !player.ca) && player.pos != 0) room.setPlayerAvatar(player.id, String(player.pos), true)
+  } else if (
+    player.es &&
+    player.isKicking &&
+    !player.isSliding &&
+    !player.isSprinting &&
+    holdDuration >= 600 &&
+    isSpeedThresholdOkay &&
+    isCoolDownDoneSlide &&
+    isCoolDownDoneSprint
+  ) {
+    room.setPlayerAvatar(player.id, "👟", true)
+  } else if (
+    isCoolDownDoneSlide &&
+    isCoolDownDoneSprint &&
+    (player.headlessAvatar === "👟" ||
+      player.headlessAvatar === "💨" ||
+      player.headlessAvatar === "⚡" ||
+      player.headlessAvatar === "🔋" ||
+      player.headlessAvatar === "⌛")
+  ) {
+    if ((!player.vip || !player.ca) && player.pos != 0)
+      room.setPlayerAvatar(player.id, String(player.pos), true)
     else if (player.ca) room.setPlayerAvatar(player.id, player.ca, true)
     else room.setPlayerAvatar(player.id, player.avatar, true)
   }
-  if (holdDuration === 0 && player.headlessAvatar === '👟') {
-    if ((!player.vip || !player.ca) && player.pos != 0) room.setPlayerAvatar(player.id, String(player.pos), true)
+  if (holdDuration === 0 && player.headlessAvatar === "👟") {
+    if ((!player.vip || !player.ca) && player.pos != 0)
+      room.setPlayerAvatar(player.id, String(player.pos), true)
     else if (player.ca) room.setPlayerAvatar(player.id, player.ca, true)
     else room.setPlayerAvatar(player.id, player.avatar, true)
   }
@@ -512,62 +700,183 @@ function handleTouchState(room, lastDribbledPlayerId) {
     const playerSpeedX = playerNx * speedMultiplier
     const playerSpeedY = playerNy * speedMultiplier
     Utils.runAfterGameTick(() => {
-      if (touchState.lastTouchDuration > ultiTimeThresholdStart && ENABLE_POW_AND_ULTI && ability === 'curve') {
+      if (
+        touchState.lastTouchDuration > ultiTimeThresholdStart &&
+        ENABLE_POW_AND_ULTI &&
+        ability === "curve"
+      ) {
         room.setDiscProperties(0, { color: 0x0000ff })
       } else {
         room.setDiscProperties(0, { color: 0xffffff })
       }
-      if (touchState.lastTouchDuration > firstTimeThreshold && !fixedBarFirstVis) {
+      if (
+        touchState.lastTouchDuration > firstTimeThreshold &&
+        !fixedBarFirstVis
+      ) {
         touchState.lastOpenedBarPlayerId = player.id
-        if (ability == 'curve') {
-          room.setDiscProperties(currentStartDisc, { x: playerX - 28, y: playerY - 25 }) // Update disc positions
-          room.setDiscProperties(currentStartDisc + 2, { x: playerX - 28, y: playerY - 25 })
-          room.setDiscProperties(currentStartDisc + 1, { x: playerX + 28, y: playerY - 25 })
-        } else if (ability == 'lob') {
+        if (ability == "curve") {
+          room.setDiscProperties(currentStartDisc, {
+            x: playerX - 28,
+            y: playerY - 25,
+          }) // Update disc positions
+          room.setDiscProperties(currentStartDisc + 2, {
+            x: playerX - 28,
+            y: playerY - 25,
+          })
+          room.setDiscProperties(currentStartDisc + 1, {
+            x: playerX + 28,
+            y: playerY - 25,
+          })
+        } else if (ability == "lob") {
           if (ENABLE_BANANA) {
-            room.setDiscProperties(currentStartDiscL, { x: playerX - 28, y: playerY - 25 }) // Update disc positions
-            room.setDiscProperties(currentStartDiscL + 2, { x: playerX - 28, y: playerY - 25 })
-            room.setDiscProperties(currentStartDiscL + 1, { x: playerX + 28, y: playerY - 25 })
+            room.setDiscProperties(currentStartDiscL, {
+              x: playerX - 28,
+              y: playerY - 25,
+            }) // Update disc positions
+            room.setDiscProperties(currentStartDiscL + 2, {
+              x: playerX - 28,
+              y: playerY - 25,
+            })
+            room.setDiscProperties(currentStartDiscL + 1, {
+              x: playerX + 28,
+              y: playerY - 25,
+            })
           } else {
-            room.setDiscProperties(currentStartDisc, { x: playerX, y: playerY - 40 }) // Update disc positions
-            room.setDiscProperties(currentStartDisc + 2, { x: playerX + 6, y: playerY - 25 })
-            room.setDiscProperties(currentStartDisc + 1, { x: playerX - 6, y: playerY - 25 })
+            room.setDiscProperties(currentStartDisc, {
+              x: playerX,
+              y: playerY - 40,
+            }) // Update disc positions
+            room.setDiscProperties(currentStartDisc + 2, {
+              x: playerX + 6,
+              y: playerY - 25,
+            })
+            room.setDiscProperties(currentStartDisc + 1, {
+              x: playerX - 6,
+              y: playerY - 25,
+            })
           }
         } else {
-          room.setDiscProperties(currentStartDisc, { x: playerX - 20, y: playerY - 25 }) // Update disc positions
-          room.setDiscProperties(currentStartDisc + 2, { x: playerX - 20, y: playerY - 25 })
-          room.setDiscProperties(currentStartDisc + 1, { x: playerX + 20, y: playerY - 25 })
+          room.setDiscProperties(currentStartDisc, {
+            x: playerX - 20,
+            y: playerY - 25,
+          }) // Update disc positions
+          room.setDiscProperties(currentStartDisc + 2, {
+            x: playerX - 20,
+            y: playerY - 25,
+          })
+          room.setDiscProperties(currentStartDisc + 1, {
+            x: playerX + 20,
+            y: playerY - 25,
+          })
         }
         fixedBarFirstVis = true
-      } else if (touchState.lastTouchDuration > firstTimeThreshold && fixedBarFirstVis) {
-        if (ENABLE_BANANA && ability == 'lob') {
-          room.setDiscProperties(currentStartDiscL, { xspeed: playerSpeedX, yspeed: playerSpeedY }) // Update disc speeds
-          room.setDiscProperties(currentStartDiscL + 2, { xspeed: playerSpeedX, yspeed: playerSpeedY })
-          room.setDiscProperties(currentStartDiscL + 1, { xspeed: playerSpeedX, yspeed: playerSpeedY })
+      } else if (
+        touchState.lastTouchDuration > firstTimeThreshold &&
+        fixedBarFirstVis
+      ) {
+        if (ENABLE_BANANA && ability == "lob") {
+          room.setDiscProperties(currentStartDiscL, {
+            xspeed: playerSpeedX,
+            yspeed: playerSpeedY,
+          }) // Update disc speeds
+          room.setDiscProperties(currentStartDiscL + 2, {
+            xspeed: playerSpeedX,
+            yspeed: playerSpeedY,
+          })
+          room.setDiscProperties(currentStartDiscL + 1, {
+            xspeed: playerSpeedX,
+            yspeed: playerSpeedY,
+          })
         } else {
-          room.setDiscProperties(currentStartDisc, { xspeed: playerSpeedX, yspeed: playerSpeedY }) // Update disc speeds
-          room.setDiscProperties(currentStartDisc + 2, { xspeed: playerSpeedX, yspeed: playerSpeedY })
-          room.setDiscProperties(currentStartDisc + 1, { xspeed: playerSpeedX, yspeed: playerSpeedY })
+          room.setDiscProperties(currentStartDisc, {
+            xspeed: playerSpeedX,
+            yspeed: playerSpeedY,
+          }) // Update disc speeds
+          room.setDiscProperties(currentStartDisc + 2, {
+            xspeed: playerSpeedX,
+            yspeed: playerSpeedY,
+          })
+          room.setDiscProperties(currentStartDisc + 1, {
+            xspeed: playerSpeedX,
+            yspeed: playerSpeedY,
+          })
         }
       }
-      if (ability == 'curve' && touchState.lastTouchDuration > firstTimeThreshold && fixedBarFirstVis && touchState.lastTouchDuration < powerTimeThreshold)
-        room.setDiscProperties(currentStartDisc + 2, { xspeed: playerSpeedX + 0.45 }) // Update disc speeds BUNU DENE
-      else if (ability == 'curve' && ENABLE_POW_AND_ULTI && touchState.lastTouchDuration > powerTimeThreshold && fixedBarFirstVis && !fixedBarPowerVis) {
+      if (
+        ability == "curve" &&
+        touchState.lastTouchDuration > firstTimeThreshold &&
+        fixedBarFirstVis &&
+        touchState.lastTouchDuration < powerTimeThreshold
+      )
+        room.setDiscProperties(currentStartDisc + 2, {
+          xspeed: playerSpeedX + 0.45,
+        })
+      // Update disc speeds BUNU DENE
+      else if (
+        ability == "curve" &&
+        ENABLE_POW_AND_ULTI &&
+        touchState.lastTouchDuration > powerTimeThreshold &&
+        fixedBarFirstVis &&
+        !fixedBarPowerVis
+      ) {
         const startDisc = room.getDisc(currentStartDisc)
-        room.setDiscProperties(currentStartDisc + 2, { x: startDisc.pos.x, y: startDisc.pos.y })
+        room.setDiscProperties(currentStartDisc + 2, {
+          x: startDisc.pos.x,
+          y: startDisc.pos.y,
+        })
         fixedBarPowerVis = true
-      } else if (ENABLE_BANANA && ability == 'lob' && touchState.lastTouchDuration > firstTimeThreshold && fixedBarFirstVis && touchState.lastTouchDuration < powerTimeThreshold)
-        room.setDiscProperties(currentStartDiscL + 2, { xspeed: playerSpeedX + 0.45 }) // Update disc speeds BUNU DENE
-      else if (ENABLE_BANANA && ability == 'lob' && touchState.lastTouchDuration > powerTimeThreshold && fixedBarFirstVis && !fixedBarPowerVis) {
-        room.setDiscProperties(currentStartDiscL, { x: playerX, y: playerY - 40 }) // Update disc positions
-        room.setDiscProperties(currentStartDiscL + 2, { x: playerX + 6, y: playerY - 25 })
-        room.setDiscProperties(currentStartDiscL + 1, { x: playerX - 6, y: playerY - 25 })
+      } else if (
+        ENABLE_BANANA &&
+        ability == "lob" &&
+        touchState.lastTouchDuration > firstTimeThreshold &&
+        fixedBarFirstVis &&
+        touchState.lastTouchDuration < powerTimeThreshold
+      )
+        room.setDiscProperties(currentStartDiscL + 2, {
+          xspeed: playerSpeedX + 0.45,
+        })
+      // Update disc speeds BUNU DENE
+      else if (
+        ENABLE_BANANA &&
+        ability == "lob" &&
+        touchState.lastTouchDuration > powerTimeThreshold &&
+        fixedBarFirstVis &&
+        !fixedBarPowerVis
+      ) {
+        room.setDiscProperties(currentStartDiscL, {
+          x: playerX,
+          y: playerY - 40,
+        }) // Update disc positions
+        room.setDiscProperties(currentStartDiscL + 2, {
+          x: playerX + 6,
+          y: playerY - 25,
+        })
+        room.setDiscProperties(currentStartDiscL + 1, {
+          x: playerX - 6,
+          y: playerY - 25,
+        })
         fixedBarPowerVis = true
-      } else if (ENABLE_BANANA && ability == 'none' && touchState.lastTouchDuration > firstTimeThreshold && fixedBarFirstVis && touchState.lastTouchDuration < powerTimeThreshold) {
-        room.setDiscProperties(currentStartDisc + 1, { xspeed: playerSpeedX + 0.1 })
+      } else if (
+        ENABLE_BANANA &&
+        ability == "none" &&
+        touchState.lastTouchDuration > firstTimeThreshold &&
+        fixedBarFirstVis &&
+        touchState.lastTouchDuration < powerTimeThreshold
+      ) {
+        room.setDiscProperties(currentStartDisc + 1, {
+          xspeed: playerSpeedX + 0.1,
+        })
         room.setDiscProperties(currentStartDisc, { xspeed: playerSpeedX - 0.1 })
-        room.setDiscProperties(currentStartDisc + 2, { xspeed: playerSpeedX - 0.1 })
-      } else if (ENABLE_BANANA && ability == 'none' && touchState.lastTouchDuration > powerTimeThreshold && fixedBarFirstVis && !fixedBarPowerVis) {
+        room.setDiscProperties(currentStartDisc + 2, {
+          xspeed: playerSpeedX - 0.1,
+        })
+      } else if (
+        ENABLE_BANANA &&
+        ability == "none" &&
+        touchState.lastTouchDuration > powerTimeThreshold &&
+        fixedBarFirstVis &&
+        !fixedBarPowerVis
+      ) {
         fixedBarPowerVis = true
       }
     })
@@ -581,11 +890,23 @@ function resetTouchState(room) {
   const ball = room.getBall()
   Utils.runAfterGameTick(() => {
     for (i = currentStartDisc; i < currentStartDisc + 3; i++)
-      if (room.getDisc(currentStartDisc)) room.setDiscProperties(i, { x: room.getDisc(currentStartDisc).pos.x, y: room.getDisc(currentStartDisc).pos.y, xspeed: 0, yspeed: 0 })
+      if (room.getDisc(currentStartDisc))
+        room.setDiscProperties(i, {
+          x: room.getDisc(currentStartDisc).pos.x,
+          y: room.getDisc(currentStartDisc).pos.y,
+          xspeed: 0,
+          yspeed: 0,
+        })
       else room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
     if (ENABLE_BANANA) {
       for (i = currentStartDiscL; i < currentStartDiscL + 3; i++)
-        if (room.getDisc(currentStartDiscL)) room.setDiscProperties(i, { x: room.getDisc(currentStartDiscL).pos.x, y: room.getDisc(currentStartDiscL).pos.y, xspeed: 0, yspeed: 0 })
+        if (room.getDisc(currentStartDiscL))
+          room.setDiscProperties(i, {
+            x: room.getDisc(currentStartDiscL).pos.x,
+            y: room.getDisc(currentStartDiscL).pos.y,
+            xspeed: 0,
+            yspeed: 0,
+          })
         else room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
     }
   })
@@ -595,11 +916,21 @@ function resetTouchState(room) {
 }
 function handleUltiState(room) {
   const elapsedTime = (Date.now() - ultiState.ultiStartTime) / 1000
-  if (elapsedTime <= 2.2 || ultiState.ultiPlayer !== touchState.lastTouchedPlayerId || !room.getPlayer(ultiState.ultiPlayer)) {
+  if (
+    elapsedTime <= 2.2 ||
+    ultiState.ultiPlayer !== touchState.lastTouchedPlayerId ||
+    !room.getPlayer(ultiState.ultiPlayer)
+  ) {
     if (!IS_ANY_ACTIVE_EFFECT) {
       resetUltiState() // Check if the ball's speed or direction has changed abruptly
       Utils.runAfterGameTick(() => {
-        room.setDiscProperties(0, { xgravity: 0, ygravity: 0, radius: normalBallRadius, cGroup: cf.ball, damping: 0.99 })
+        room.setDiscProperties(0, {
+          xgravity: 0,
+          ygravity: 0,
+          radius: normalBallRadius,
+          cGroup: cf.ball,
+          damping: 0.99,
+        })
       })
       return
     }
@@ -613,10 +944,14 @@ function handleUltiState(room) {
     const positiveX = [8, 11, 9, 10]
     const negativeY = [1, 13, 5, 9]
     const positiveY = [2, 14, 6, 10]
-    if (negativeX.includes(playerInput)) gravity.x = -0.24 / Math.max(Math.abs(ball.speed.x), 1)
-    else if (positiveX.includes(playerInput)) gravity.x = 0.24 / Math.max(Math.abs(ball.speed.x), 1)
-    if (negativeY.includes(playerInput)) gravity.y = -0.24 / Math.max(Math.abs(ball.speed.y), 1)
-    else if (positiveY.includes(playerInput)) gravity.y = 0.24 / Math.max(Math.abs(ball.speed.y), 1)
+    if (negativeX.includes(playerInput))
+      gravity.x = -0.24 / Math.max(Math.abs(ball.speed.x), 1)
+    else if (positiveX.includes(playerInput))
+      gravity.x = 0.24 / Math.max(Math.abs(ball.speed.x), 1)
+    if (negativeY.includes(playerInput))
+      gravity.y = -0.24 / Math.max(Math.abs(ball.speed.y), 1)
+    else if (positiveY.includes(playerInput))
+      gravity.y = 0.24 / Math.max(Math.abs(ball.speed.y), 1)
     Utils.runAfterGameTick(() => {
       room.setDiscProperties(0, {
         xgravity: gravity.x,
@@ -627,14 +962,22 @@ function handleUltiState(room) {
     resetUltiState()
     IS_ANY_ACTIVE_EFFECT = false
     Utils.runAfterGameTick(() => {
-      room.setDiscProperties(0, { xgravity: 0, ygravity: 0, radius: normalBallRadius, cGroup: cf.ball, damping: 0.99 })
+      room.setDiscProperties(0, {
+        xgravity: 0,
+        ygravity: 0,
+        radius: normalBallRadius,
+        cGroup: cf.ball,
+        damping: 0.99,
+      })
     })
   }
 }
 function handleCurveState(room) {
   const elapsedTime = (Date.now() - curveState.curveStartTime) / 1000 // Time since curve started
   if (elapsedTime <= curveState.curveDuration) {
-    const increasingFactor = (Math.min(elapsedTime * 3, 0.7) * (1 + curveState.curveIntensity * 4)) / curveState.curveDuration
+    const increasingFactor =
+      (Math.min(elapsedTime * 3, 0.7) * (1 + curveState.curveIntensity * 4)) /
+      curveState.curveDuration
     const curveEffect = {
       x: curveState.curveDirection.x * 0.1 * increasingFactor, // Apply the curve effect
       y: curveState.curveDirection.y * 0.1 * increasingFactor,
@@ -645,20 +988,35 @@ function handleCurveState(room) {
       // Check if the ball's speed or direction has changed abruptly
       resetCurveState() // Stop the curve
       Utils.runAfterGameTick(() => {
-        room.setDiscProperties(0, { xgravity: 0, ygravity: 0, radius: normalBallRadius, cGroup: cf.ball, damping: 0.99 })
+        room.setDiscProperties(0, {
+          xgravity: 0,
+          ygravity: 0,
+          radius: normalBallRadius,
+          cGroup: cf.ball,
+          damping: 0.99,
+        })
       })
       return
     }
     curveState.ballGravityX = velocity.xspeed * 0.5
     curveState.ballGravityY = -velocity.yspeed * 0.5
     Utils.runAfterGameTick(() => {
-      room.setDiscProperties(0, { xgravity: curveState.ballGravityX, ygravity: curveState.ballGravityY }) // Apply new velocity
+      room.setDiscProperties(0, {
+        xgravity: curveState.ballGravityX,
+        ygravity: curveState.ballGravityY,
+      }) // Apply new velocity
     })
   } else {
     resetCurveState() // End the curve effect naturally
     IS_ANY_ACTIVE_EFFECT = false
     Utils.runAfterGameTick(() => {
-      room.setDiscProperties(0, { xgravity: 0, ygravity: 0, radius: normalBallRadius, cGroup: cf.ball, damping: 0.99 })
+      room.setDiscProperties(0, {
+        xgravity: 0,
+        ygravity: 0,
+        radius: normalBallRadius,
+        cGroup: cf.ball,
+        damping: 0.99,
+      })
     })
   }
 }
@@ -673,7 +1031,11 @@ function isClosestPlayerTouchingBall(posBall, closestPlayer) {
   if (!closestPlayer || !closestPlayer.pos) return 0 // Early return if no player
   const distance = calculateDistance(posBall, closestPlayer.pos) // Determine touch type based on player position at below
   if (distance > TOUCH_DISTANCE) return 0 // Early return if not touching // Player is below the ball (touching from downside)
-  if ((closestPlayer.pos.y > posBall.y && closestPlayer.pos.x > posBall.x) || (closestPlayer.pos.y < posBall.y && closestPlayer.pos.x < posBall.x)) return 1
+  if (
+    (closestPlayer.pos.y > posBall.y && closestPlayer.pos.x > posBall.x) ||
+    (closestPlayer.pos.y < posBall.y && closestPlayer.pos.x < posBall.x)
+  )
+    return 1
   return 2 // Player is above the ball (touching from upside)
 }
 function isMovingRightOfPerpendicular(player, ball) {
@@ -705,13 +1067,19 @@ function isMovingRightOfPerpendicular(player, ball) {
   return dot > 0
 }
 function calculateCurveEffectDirection(ball, player) {
-  const kickDirection = { x: ball.x - player.disc.pos.x, y: ball.y - player.disc.pos.y }
+  const kickDirection = {
+    x: ball.x - player.disc.pos.x,
+    y: ball.y - player.disc.pos.y,
+  }
   const magnitudeSquared = kickDirection.x ** 2 + kickDirection.y ** 2
   if (magnitudeSquared === 0) return { x: 0, y: 0 } // Avoid division by zero
   const magnitude = Math.sqrt(magnitudeSquared)
   const directionForAngle = isMovingRightOfPerpendicular(player, ball)
   const directionMultiplier = directionForAngle ? 1 : -1
-  return { x: (kickDirection.y / magnitude) * directionMultiplier, y: (kickDirection.x / magnitude) * directionMultiplier }
+  return {
+    x: (kickDirection.y / magnitude) * directionMultiplier,
+    y: (kickDirection.x / magnitude) * directionMultiplier,
+  }
 }
 function resetCurveState() {
   curveState.isCurving = false
@@ -730,22 +1098,48 @@ let isShot = false
 let lId, sId, prevLId, tId
 function updateLastTouchedPlayer(playerId, room) {
   if (playerId !== touchState.lastTouchedPlayerId) {
-    if (touchState.lastTouchedPlayerId != null && room.getPlayer(touchState.lastTouchedPlayerId) != null) {
-      if (touchState.secondLastTouchedPlayerId != null && room.getPlayer(touchState.secondLastTouchedPlayerId) != null) {
-        touchState.thirdLastTouchedPlayerId = touchState.secondLastTouchedPlayerId
-        touchState.thirdLastTouchedPlayerName = room.getPlayer(touchState.thirdLastTouchedPlayerId).name
+    if (
+      touchState.lastTouchedPlayerId != null &&
+      room.getPlayer(touchState.lastTouchedPlayerId) != null
+    ) {
+      if (
+        touchState.secondLastTouchedPlayerId != null &&
+        room.getPlayer(touchState.secondLastTouchedPlayerId) != null
+      ) {
+        touchState.thirdLastTouchedPlayerId =
+          touchState.secondLastTouchedPlayerId
+        touchState.thirdLastTouchedPlayerName = room.getPlayer(
+          touchState.thirdLastTouchedPlayerId,
+        ).name
       }
       touchState.secondLastTouchedPlayerId = touchState.lastTouchedPlayerId
-      touchState.secondLastTouchedPlayerName = room.getPlayer(touchState.secondLastTouchedPlayerId).name
+      touchState.secondLastTouchedPlayerName = room.getPlayer(
+        touchState.secondLastTouchedPlayerId,
+      ).name
     }
     touchState.lastTouchedPlayerId = playerId
-    touchState.lastTouchedPlayerName = room.getPlayer(touchState.lastTouchedPlayerId).name
+    touchState.lastTouchedPlayerName = room.getPlayer(
+      touchState.lastTouchedPlayerId,
+    ).name
     touchState.lastDribbledPlayerId = touchState.lastTouchedPlayerId
     if (lId) prevLId = lId
-    lId = room.getPlayer(touchState.lastTouchedPlayerId) ? room.getPlayer(touchState.lastTouchedPlayerId) : null
-    sId = room.getPlayer(touchState.secondLastTouchedPlayerId) ? room.getPlayer(touchState.secondLastTouchedPlayerId) : null
-    tId = room.getPlayer(touchState.thirdLastTouchedPlayerId) ? room.getPlayer(touchState.thirdLastTouchedPlayerId) : null
-    if (tId && sId && lId && sId.team.id !== tId.team.id && lId.id !== sId.id && lId.team.id === sId.team.id) {
+    lId = room.getPlayer(touchState.lastTouchedPlayerId)
+      ? room.getPlayer(touchState.lastTouchedPlayerId)
+      : null
+    sId = room.getPlayer(touchState.secondLastTouchedPlayerId)
+      ? room.getPlayer(touchState.secondLastTouchedPlayerId)
+      : null
+    tId = room.getPlayer(touchState.thirdLastTouchedPlayerId)
+      ? room.getPlayer(touchState.thirdLastTouchedPlayerId)
+      : null
+    if (
+      tId &&
+      sId &&
+      lId &&
+      sId.team.id !== tId.team.id &&
+      lId.id !== sId.id &&
+      lId.team.id === sId.team.id
+    ) {
       sId.topc++
     }
     if (!lId || !sId || lId.id === sId.id || isShot || lId === prevLId) return
@@ -813,8 +1207,24 @@ Room.create(
           room.setScoreLimit(SCORE_LIMIT)
           room.setTimeLimit(TIME_LIMIT)
           stadFCmd()
-          dbKits[homeTeam].slice(1, 2).forEach((k) => (k.c3 !== undefined ? room.setTeamColors(Team.RED, k.a, k.c0, k.c1, k.c2, k.c3) : k.c2 !== undefined ? room.setTeamColors(Team.RED, k.a, k.c0, k.c1, k.c2) : room.setTeamColors(Team.RED, k.a, k.c0, k.c1)))
-          dbKits[awayTeam].slice(1, 2).forEach((k) => (k.c3 !== undefined ? room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1, k.c2, k.c3) : k.c2 !== undefined ? room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1, k.c2) : room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1)))
+          dbKits[homeTeam]
+            .slice(1, 2)
+            .forEach((k) =>
+              k.c3 !== undefined
+                ? room.setTeamColors(Team.RED, k.a, k.c0, k.c1, k.c2, k.c3)
+                : k.c2 !== undefined
+                  ? room.setTeamColors(Team.RED, k.a, k.c0, k.c1, k.c2)
+                  : room.setTeamColors(Team.RED, k.a, k.c0, k.c1),
+            )
+          dbKits[awayTeam]
+            .slice(1, 2)
+            .forEach((k) =>
+              k.c3 !== undefined
+                ? room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1, k.c2, k.c3)
+                : k.c2 !== undefined
+                  ? room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1, k.c2)
+                  : room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1),
+            )
           sendAnnos(room)
         }
       }
@@ -833,175 +1243,365 @@ Room.create(
       */
       function getCommand(commandStr) {
         if (commands.hasOwnProperty(commandStr)) return commandStr
-        for (const [key, value] of Object.entries(commands)) for (let alias of value.aliases) if (alias == commandStr) return key
+        for (const [key, value] of Object.entries(commands))
+          for (let alias of value.aliases) if (alias == commandStr) return key
         return false
       }
       function helpCmd(player) {
-        room.sendAnnouncement(helpString, player.id, colorSucces, 'normal', NotifSound.NONE)
+        room.sendAnnouncement(
+          helpString,
+          player.id,
+          colorSucces,
+          "normal",
+          NotifSound.NONE,
+        )
       }
       function controlsCmd(player) {
-        room.sendAnnouncement(controlsString, player.id, colorInfo, 'small', NotifSound.NONE)
+        room.sendAnnouncement(
+          controlsString,
+          player.id,
+          colorInfo,
+          "small",
+          NotifSound.NONE,
+        )
       }
       function changeSlideStatePlayerSpecialCmd(player) {
         if (!player.es) {
           player.es = true
-          room.sendAnnouncement(`${emojiSucces} Slide ability enabled.`, player.id, colorSucces, 'small', NotifSound.NONE)
+          room.sendAnnouncement(
+            `${emojiSucces} Slide ability enabled.`,
+            player.id,
+            colorSucces,
+            "small",
+            NotifSound.NONE,
+          )
         } else {
           player.es = false
-          room.sendAnnouncement(`${emojiSucces} Slide ability disabled.`, player.id, colorSucces, 'small', NotifSound.NONE)
+          room.sendAnnouncement(
+            `${emojiSucces} Slide ability disabled.`,
+            player.id,
+            colorSucces,
+            "small",
+            NotifSound.NONE,
+          )
         }
         return
       }
       function changeOPModeStatePlayerSpecialCmd(player) {
         if (!player.op) {
           player.op = true
-          room.sendAnnouncement(`${emojiSucces} OP-mode ability enabled.`, player.id, colorSucces, 'small', NotifSound.NONE)
+          room.sendAnnouncement(
+            `${emojiSucces} OP-mode ability enabled.`,
+            player.id,
+            colorSucces,
+            "small",
+            NotifSound.NONE,
+          )
         } else {
           player.op = false
-          room.sendAnnouncement(`${emojiSucces} OP-mode ability disabled.`, player.id, colorSucces, 'small', NotifSound.NONE)
+          room.sendAnnouncement(
+            `${emojiSucces} OP-mode ability disabled.`,
+            player.id,
+            colorSucces,
+            "small",
+            NotifSound.NONE,
+          )
         }
         return
       }
       function setCurveAbility(player) {
-        if (player.e === 'curve') {
-          room.sendAnnouncement(`${emojiAtt} Curve ability selected already.`, player.id, colorAtt, 'small', NotifSound.NONE)
+        if (player.e === "curve") {
+          room.sendAnnouncement(
+            `${emojiAtt} Curve ability selected already.`,
+            player.id,
+            colorAtt,
+            "small",
+            NotifSound.NONE,
+          )
           return
         }
-        setSpecialAbility(player, 'curve', 'Curve')
+        setSpecialAbility(player, "curve", "Curve")
       }
       function setLobAbility(player) {
-        if (player.e === 'lob') {
-          room.sendAnnouncement(`${emojiAtt} Lob-shot ability selected already.`, player.id, colorAtt, 'small', NotifSound.NONE)
+        if (player.e === "lob") {
+          room.sendAnnouncement(
+            `${emojiAtt} Lob-shot ability selected already.`,
+            player.id,
+            colorAtt,
+            "small",
+            NotifSound.NONE,
+          )
           return
         }
-        setSpecialAbility(player, 'lob', 'Lob-shot')
+        setSpecialAbility(player, "lob", "Lob-shot")
       }
       function setNoneAbility(player) {
-        if (player.e === 'none') {
-          room.sendAnnouncement(`${emojiAtt} Auto-powershot selected already.`, player.id, colorAtt, 'small', NotifSound.NONE)
+        if (player.e === "none") {
+          room.sendAnnouncement(
+            `${emojiAtt} Auto-powershot selected already.`,
+            player.id,
+            colorAtt,
+            "small",
+            NotifSound.NONE,
+          )
           return
         }
-        setSpecialAbility(player, 'none', 'Auto-powershot')
+        setSpecialAbility(player, "none", "Auto-powershot")
       }
       function setSpecialAbility(player, abilityValue, abilityLabel) {
         try {
           player.e = abilityValue
-          const msg = abilityValue === 'none' ? `${emojiSucces} Successfully selected Auto-powershot ability!` : `${emojiSucces} Successfully selected ${abilityLabel} ability!`
-          room.sendAnnouncement(msg, player.id, colorSucces, 'small', NotifSound.NONE)
+          const msg =
+            abilityValue === "none"
+              ? `${emojiSucces} Successfully selected Auto-powershot ability!`
+              : `${emojiSucces} Successfully selected ${abilityLabel} ability!`
+          room.sendAnnouncement(
+            msg,
+            player.id,
+            colorSucces,
+            "small",
+            NotifSound.NONE,
+          )
         } catch (err) {
           console.error(err)
         } finally {
         }
       }
       function dcCmd(player) {
-        room.sendAnnouncement(discordString, player.id, colorDiscord, 'bold', NotifSound.NONE)
+        room.sendAnnouncement(
+          discordString,
+          player.id,
+          colorDiscord,
+          "bold",
+          NotifSound.NONE,
+        )
       }
       function leaveCmd(player) {
         const hour = new Date().getHours()
         let message
-        if (hour >= 6 && hour < 18) message = 'Good day, see you again.'
-        else if (hour >= 18 && hour < 23) message = 'Good evening, see you again.'
-        else message = 'Good night, see you again.'
+        if (hour >= 6 && hour < 18) message = "Good day, see you again."
+        else if (hour >= 18 && hour < 23)
+          message = "Good evening, see you again."
+        else message = "Good night, see you again."
         room.kickPlayer(player.id, message, false)
       }
-      function setNormalAvatar(player, message) {
-        // if (!(gameState === State.PLAY_FUN || gameState === State.PLAY_RANKED)) {
-        //   room.sendAnnouncement(`${emojiAtt} Şu anda herhangi bir maç oynamıyorsun.`, player.id, colorAtt, 'bold', NotifSound.NONE)
-        //   return false
-        // }
-        const msgArray = message.split(/ +/).slice(1)
-        const nav = msgArray.join(' ')
-        if (nav.length > 0 && nav.length <= 2 && !nav.includes(' ')) {
-          room.setPlayerAvatar(player.id, nav, true)
-          if (!player.ca) player.ca = nav
-          room.sendAnnouncement(`${emojiSucces} Avatarını başarıyla ${nav} olarak ayarladın.`, player.id, colorSucces, 'bold', NotifSound.NONE)
-        } else {
-          room.sendAnnouncement(`${emojiAtt} Avatar en fazla 2 karakter uzunluğunda ve boşluksuz olmalı.`, player.id, colorAtt, 'bold', NotifSound.NONE)
-        }
-      }
-      function disableNormalAvatar(player) {
-        if (player.ca === null) {
-          room.sendAnnouncement(`${emojiAtt} Zaten şu anda herhangi bir avatar ayarlamadın.`, player.id, colorAtt, 'bold', NotifSound.NONE)
-          return false
-        }
-        player.ca = null
-        room.setPlayerAvatar(player.id, player.avatar, true)
-        setTimeout(() => {
-          room.setPlayerAvatar(player.id, player.avatar, true)
-        }, 1000)
-        room.sendAnnouncement(`${emojiSucces} Successfully removed your avatar.`, player.id, colorSucces, 'bold', NotifSound.NONE)
-      }
       function seeKitsCmd(player) {
-        room.sendAnnouncement(`${kitsInfo}`, player.id, colorInfo, 'small', NotifSound.NONE)
-        room.sendAnnouncement(`${emojiInfo} To change kits, use !kr <kit_no> (Red) | !kb <kit_no> (Blue)`, player.id, colorInfo, 'small', NotifSound.NONE)
+        room.sendAnnouncement(
+          `${kitsInfo}`,
+          player.id,
+          colorInfo,
+          "small",
+          NotifSound.NONE,
+        )
+        room.sendAnnouncement(
+          `${emojiInfo} To change kits, use !kr <kit_no> (Red) | !kb <kit_no> (Blue)`,
+          player.id,
+          colorInfo,
+          "small",
+          NotifSound.NONE,
+        )
       }
       function changeRedKitCmd(player, message) {
         if (message.length < 2) {
-          room.sendAnnouncement(`${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`, player.id, colorAtt, 'bold', NotifSound.NONE)
+          room.sendAnnouncement(
+            `${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`,
+            player.id,
+            colorAtt,
+            "bold",
+            NotifSound.NONE,
+          )
           return
         }
         const msgArray = message.split(/ +/).slice(1)
         if (msgArray.length < 1) {
-          room.sendAnnouncement(`${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`, player.id, colorAtt, 'bold', NotifSound.NONE)
+          room.sendAnnouncement(
+            `${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`,
+            player.id,
+            colorAtt,
+            "bold",
+            NotifSound.NONE,
+          )
           return
         }
         if (msgArray[0].length > 0) {
           if (msgArray[0] < dbKits.length && msgArray[0] >= 0) {
             const kit = msgArray[0]
             if (awayTeam == kit) {
-              room.sendAnnouncement(`${emojiAtt} You cannot assign the same kit to both teams.`, player.id, colorAtt, 'bold', NotifSound.NONE)
+              room.sendAnnouncement(
+                `${emojiAtt} You cannot assign the same kit to both teams.`,
+                player.id,
+                colorAtt,
+                "bold",
+                NotifSound.NONE,
+              )
               return
             }
             homeTeam = kit
-            dbKits[kit].slice(1, 2).forEach((k) => (k.c3 !== undefined ? room.setTeamColors(Team.RED, k.a, k.c0, k.c1, k.c2, k.c3) : k.c2 !== undefined ? room.setTeamColors(Team.RED, k.a, k.c0, k.c1, k.c2) : room.setTeamColors(Team.RED, k.a, k.c0, k.c1)))
-            room.sendAnnouncement(`${emojiSucces} ${player.name}, assigned the ${dbKits[kit][0].t} kit for red team.`, null, colorSucces, 'small', NotifSound.NONE)
-          } else room.sendAnnouncement(`${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`, player.id, colorAtt, 'bold', NotifSound.NONE)
+            dbKits[kit]
+              .slice(1, 2)
+              .forEach((k) =>
+                k.c3 !== undefined
+                  ? room.setTeamColors(Team.RED, k.a, k.c0, k.c1, k.c2, k.c3)
+                  : k.c2 !== undefined
+                    ? room.setTeamColors(Team.RED, k.a, k.c0, k.c1, k.c2)
+                    : room.setTeamColors(Team.RED, k.a, k.c0, k.c1),
+              )
+            room.sendAnnouncement(
+              `${emojiSucces} ${player.name}, assigned the ${dbKits[kit][0].t} kit for red team.`,
+              null,
+              colorSucces,
+              "small",
+              NotifSound.NONE,
+            )
+          } else
+            room.sendAnnouncement(
+              `${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`,
+              player.id,
+              colorAtt,
+              "bold",
+              NotifSound.NONE,
+            )
         }
       }
       function changeBlueKitCmd(player, message) {
         if (message.length < 2) {
-          room.sendAnnouncement(`${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`, player.id, colorAtt, 'bold', NotifSound.NONE)
+          room.sendAnnouncement(
+            `${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`,
+            player.id,
+            colorAtt,
+            "bold",
+            NotifSound.NONE,
+          )
           return
         }
         const msgArray = message.split(/ +/).slice(1)
         if (msgArray.length < 1) {
-          room.sendAnnouncement(`${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`, player.id, colorAtt, 'bold', NotifSound.NONE)
+          room.sendAnnouncement(
+            `${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`,
+            player.id,
+            colorAtt,
+            "bold",
+            NotifSound.NONE,
+          )
           return
         }
         if (msgArray && msgArray[0] && msgArray[0].length > 0) {
           if (msgArray[0] < dbKits.length && msgArray[0] >= 0) {
             const kit = msgArray[0]
             if (homeTeam == kit) {
-              room.sendAnnouncement(`${emojiAtt} You cannot assign the same kit to both teams.`, player.id, colorAtt, 'bold', NotifSound.NONE)
+              room.sendAnnouncement(
+                `${emojiAtt} You cannot assign the same kit to both teams.`,
+                player.id,
+                colorAtt,
+                "bold",
+                NotifSound.NONE,
+              )
               return
             }
             awayTeam = kit
-            dbKits[kit].slice(1, 2).forEach((k) => (k.c3 !== undefined ? room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1, k.c2, k.c3) : k.c2 !== undefined ? room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1, k.c2) : room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1)))
-            room.sendAnnouncement(`${emojiSucces} ${player.name}, assigned the ${dbKits[kit][0].t} kit for blue team.`, null, colorSucces, 'small', NotifSound.NONE)
-          } else room.sendAnnouncement(`${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`, player.id, colorAtt, 'bold', NotifSound.NONE)
+            dbKits[kit]
+              .slice(1, 2)
+              .forEach((k) =>
+                k.c3 !== undefined
+                  ? room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1, k.c2, k.c3)
+                  : k.c2 !== undefined
+                    ? room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1, k.c2)
+                    : room.setTeamColors(Team.BLUE, k.a, k.c0, k.c1),
+              )
+            room.sendAnnouncement(
+              `${emojiSucces} ${player.name}, assigned the ${dbKits[kit][0].t} kit for blue team.`,
+              null,
+              colorSucces,
+              "small",
+              NotifSound.NONE,
+            )
+          } else
+            room.sendAnnouncement(
+              `${emojiAtt} Kit number must be between 0 and ${dbKits.length}.`,
+              player.id,
+              colorAtt,
+              "bold",
+              NotifSound.NONE,
+            )
         }
       }
       function stadFCmd() {
         room.stopGame()
-        room.setCurrentStadium(Utils.parseStadium(JSON.stringify(stadiumF), console.log))
+        room.setCurrentStadium(
+          Utils.parseStadium(JSON.stringify(stadiumF), console.log),
+        )
       }
       function claimAdminCmd(player) {
         room.setPlayerAdmin(player.id, true)
-        room.sendAnnouncement(`${emojiSucces} ${player.name} is now an admin.`, null, colorSucces, 'small', NotifSound.NONE)
+        room.sendAnnouncement(
+          `${emojiSucces} ${player.name} is now an admin.`,
+          null,
+          colorSucces,
+          "small",
+          NotifSound.NONE,
+        )
       }
       const commands = {
-        help: { aliases: ['commands'], roles: Role.PLAYER, desc: true, function: helpCmd },
-        controls: { aliases: [], roles: Role.PLAYER, desc: true, function: controlsCmd },
-        dc: { aliases: ['discord'], roles: Role.PLAYER, desc: true, function: dcCmd },
-        bb: { aliases: ['bye'], roles: Role.PLAYER, desc: true, function: leaveCmd },
-        sl: { aliases: ['slide'], roles: Role.PLAYER, desc: true, function: changeSlideStatePlayerSpecialCmd },
-        op: { aliases: [], roles: Role.PLAYER, desc: true, function: changeOPModeStatePlayerSpecialCmd },
-        kits: { aliases: ['shirts'], roles: Role.PLAYER, desc: true, function: seeKitsCmd },
-        kr: { aliases: [], roles: Role.PLAYER, desc: true, function: changeRedKitCmd },
-        kb: { aliases: [], roles: Role.PLAYER, desc: true, function: changeBlueKitCmd },
-        setnav: { aliases: [], roles: Role.PLAYER, desc: true, function: setNormalAvatar },
-        removenav: { aliases: [], roles: Role.PLAYER, desc: true, function: disableNormalAvatar },
-        claim: { aliases: [], roles: Role.PLAYER, desc: true, function: claimAdminCmd },
+        help: {
+          aliases: ["commands"],
+          roles: Role.PLAYER,
+          desc: true,
+          function: helpCmd,
+        },
+        controls: {
+          aliases: [],
+          roles: Role.PLAYER,
+          desc: true,
+          function: controlsCmd,
+        },
+        dc: {
+          aliases: ["discord"],
+          roles: Role.PLAYER,
+          desc: true,
+          function: dcCmd,
+        },
+        bb: {
+          aliases: ["bye"],
+          roles: Role.PLAYER,
+          desc: true,
+          function: leaveCmd,
+        },
+        sl: {
+          aliases: ["slide"],
+          roles: Role.PLAYER,
+          desc: true,
+          function: changeSlideStatePlayerSpecialCmd,
+        },
+        op: {
+          aliases: [],
+          roles: Role.PLAYER,
+          desc: true,
+          function: changeOPModeStatePlayerSpecialCmd,
+        },
+        kits: {
+          aliases: ["shirts"],
+          roles: Role.PLAYER,
+          desc: true,
+          function: seeKitsCmd,
+        },
+        kr: {
+          aliases: [],
+          roles: Role.PLAYER,
+          desc: true,
+          function: changeRedKitCmd,
+        },
+        kb: {
+          aliases: [],
+          roles: Role.PLAYER,
+          desc: true,
+          function: changeBlueKitCmd,
+        },
+        claim: {
+          aliases: [],
+          roles: Role.PLAYER,
+          desc: true,
+          function: claimAdminCmd,
+        },
       }
       /*
             ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -1013,13 +1613,13 @@ Room.create(
         if (!value) {
           const player = room.getPlayer(playerId)
           player.syncCount += 1
-          console.log('SYNC CHANGED', player.name, player.syncCount)
+          console.log("SYNC CHANGED", player.name, player.syncCount)
         }
       }
       room.onPlayerObjectCreated = async function (pObj) {
         pObj.lhd = 0
         pObj.lbkt = 0
-        pObj.e = 'curve'
+        pObj.e = "curve"
         pObj.syncCount = 0
         pObj.pos = 0
         pObj.es = true
@@ -1039,20 +1639,13 @@ Room.create(
           }
         }, 1000)
         try {
-          pObj.e = 'curve'
+          pObj.e = "curve"
         } catch (err) {
           console.error(err)
         }
       }
       room.onOperationReceived = (type, message) => {
         switch (type) {
-          case OperationType.SetAvatar: {
-            const player = room.getPlayer(message.byId)
-            if (!(player.vip >= 2 || player.mod)) {
-              room.sendAnnouncement(`${emojiAtt} VIP olmadan avatarını değiştiremezsin.`, player.id, colorAtt, 'bold', NotifSound.NONE)
-              return false
-            } else return true
-          }
           case OperationType.SendInput: {
             const player = room.getPlayer(message.byId)
             if (player.ib || player.ipb || player.ige) message.input = 0
@@ -1061,8 +1654,8 @@ Room.create(
           case OperationType.SendChat: {
             const msg = message.text
             const player = room.getPlayer(message.byId)
-            if (msg[0][0] == '!') {
-              const parts = msg.replace('!', '').split(' ')
+            if (msg[0][0] == "!") {
+              const parts = msg.replace("!", "").split(" ")
               let command = getCommand(parts[0].toLowerCase())
               const commandRoles = commands[command]?.roles
               const playerRoles = [Role.PLAYER]
@@ -1070,19 +1663,30 @@ Room.create(
                 commands[command].function(player, msg)
               } else
                 setTimeout(function () {
-                  room.sendAnnouncement(`${emojiAtt} Command is invalid. !help`, player.id, colorAtt, 'bold', NotifSound.NONE)
+                  room.sendAnnouncement(
+                    `${emojiAtt} Command is invalid. !help`,
+                    player.id,
+                    colorAtt,
+                    "bold",
+                    NotifSound.NONE,
+                  )
                 }, 200)
               return false
             }
-            if (msg.length > 0 && (msg.toLowerCase() === 'c' || msg.toLowerCase() === 'l' || msg.toLowerCase() === 'a')) {
+            if (
+              msg.length > 0 &&
+              (msg.toLowerCase() === "c" ||
+                msg.toLowerCase() === "l" ||
+                msg.toLowerCase() === "a")
+            ) {
               switch (msg.toLowerCase()) {
-                case 'c':
+                case "c":
                   setCurveAbility(player)
                   break
-                case 'l':
+                case "l":
                   setLobAbility(player)
                   break
-                case 'a':
+                case "a":
                   setNoneAbility(player)
                   break
                 default:
@@ -1090,7 +1694,13 @@ Room.create(
               }
               return false
             }
-            room.sendAnnouncement(`${player.name}: ${msg}`, null, colorWhite, 'normal', NotifSound.CHAT)
+            room.sendAnnouncement(
+              `${player.name}: ${msg}`,
+              null,
+              colorWhite,
+              "normal",
+              NotifSound.CHAT,
+            )
             return false
           }
           default:
@@ -1478,9 +2088,17 @@ Room.create(
             { x: 5, y: -5 },
           ],
         ],
-        ' ': [],
+        " ": [],
       }
-      function drawText(text, centerX = 0, centerY = 0, spacing = 15, discStartId = 12, scale = 1, maxDiscId = 87) {
+      function drawText(
+        text,
+        centerX = 0,
+        centerY = 0,
+        spacing = 15,
+        discStartId = 12,
+        scale = 1,
+        maxDiscId = 87,
+      ) {
         let discId = discStartId
         const upperText = text.toUpperCase()
         const totalWidth = upperText.length * spacing * scale
@@ -1495,7 +2113,7 @@ Room.create(
             }
             for (const seg of segments) {
               if (discId + 1 > maxDiscId) {
-                console.warn('Disc ID limit exceeded.')
+                console.warn("Disc ID limit exceeded.")
                 return
               }
               const p1 = seg[0]
@@ -1521,7 +2139,7 @@ Room.create(
               const segments = letterMap[char]
               for (const seg of segments) {
                 if (discId + 1 > maxDiscId) {
-                  console.warn('Disc ID limit exceeded.')
+                  console.warn("Disc ID limit exceeded.")
                   return
                 }
                 room.setDiscProperties(discId, {
@@ -1541,20 +2159,20 @@ Room.create(
       }
       function replaceTurkishChars(text) {
         const map = {
-          Ç: 'C',
-          Ğ: 'G',
-          İ: 'I',
-          I: 'I',
-          Ö: 'O',
-          Ş: 'S',
-          Ü: 'U',
-          ç: 'C',
-          ğ: 'G',
-          ı: 'I',
-          i: 'I',
-          ö: 'O',
-          ş: 'S',
-          ü: 'U',
+          Ç: "C",
+          Ğ: "G",
+          İ: "I",
+          I: "I",
+          Ö: "O",
+          Ş: "S",
+          Ü: "U",
+          ç: "C",
+          ğ: "G",
+          ı: "I",
+          i: "I",
+          ö: "O",
+          ş: "S",
+          ü: "U",
         }
         return text.replace(/[çğıöşüÇĞİÖŞÜ]/g, (c) => map[c] || c)
       }
@@ -1566,7 +2184,12 @@ Room.create(
         const rps = ps.red
         const bps = ps.blue
         const centerPlayer = room.getPlayer(testGEgp?.id)
-        if (!centerPlayer || !centerPlayer.disc?.pos || !centerPlayer.disc?.speed) return
+        if (
+          !centerPlayer ||
+          !centerPlayer.disc?.pos ||
+          !centerPlayer.disc?.speed
+        )
+          return
         const otps = centerPlayer.team.id === Team.RED ? bps : rps
         const gpsx = centerPlayer.disc.speed.x
         const gpsy = centerPlayer.disc.speed.y
@@ -1625,42 +2248,75 @@ Room.create(
         IS_ANY_ACTIVE_EFFECT = false
         const ballSpeed = Math.sqrt(ball.speed.x ** 2 + ball.speed.y ** 2) // Maintain the ball's current speed magnitude
         const elapsedTime = convertSecondsToTime(room.timeElapsed)
-        let goalPlayer = room.getPlayer(touchState.lastTouchedPlayerId) ? room.getPlayer(touchState.lastTouchedPlayerId) : 'someone who left room'
+        let goalPlayer = room.getPlayer(touchState.lastTouchedPlayerId)
+          ? room.getPlayer(touchState.lastTouchedPlayerId)
+          : "someone who left room"
         goalPlayer.vip = 5
         goalPlayer.goalT = GOAL_TEXT
         let isOG = goalPlayer?.team?.id !== team
         let checkForAssist = false
-        if (isOG && touchState.lastKickedPlayerId !== touchState.lastTouchedPlayerId) {
-          goalPlayer = room.getPlayer(touchState.lastKickedPlayerId) ? room.getPlayer(touchState.lastKickedPlayerId) : 'someone who left room'
+        if (
+          isOG &&
+          touchState.lastKickedPlayerId !== touchState.lastTouchedPlayerId
+        ) {
+          goalPlayer = room.getPlayer(touchState.lastKickedPlayerId)
+            ? room.getPlayer(touchState.lastKickedPlayerId)
+            : "someone who left room"
           isOG = goalPlayer ? goalPlayer.team.id !== team : false
           checkForAssist = true
         }
         const speedText = `${(ballSpeed * 12).toFixed(1)} km/h`
         const assistText =
-          checkForAssist && touchState.secondLastTouchedPlayerId === touchState.lastKickedPlayerId && touchState.thirdLastTouchedPlayerId ? `・(👟 ${touchState.thirdLastTouchedPlayerName})` : touchState.secondLastTouchedPlayerId ? `・(👟 ${touchState.secondLastTouchedPlayerName})` : null
-        const goalType = isOG ? '🤡' : '⚽'
+          checkForAssist &&
+          touchState.secondLastTouchedPlayerId ===
+            touchState.lastKickedPlayerId &&
+          touchState.thirdLastTouchedPlayerId
+            ? `・(👟 ${touchState.thirdLastTouchedPlayerName})`
+            : touchState.secondLastTouchedPlayerId
+              ? `・(👟 ${touchState.secondLastTouchedPlayerName})`
+              : null
+        const goalType = isOG ? "🤡" : "⚽"
         const teamColor = team == Team.RED ? colorRed : colorBlue
-        let goalText = isOG ? 'scored an own goal!' : 'scored a goal!'
+        let goalText = isOG ? "scored an own goal!" : "scored a goal!"
         let isOGA = false
         let assistPlayer = null
         if (touchState.secondLastTouchedPlayerId && !isOG) {
-          assistPlayer = checkForAssist && touchState.secondLastTouchedPlayerId === touchState.lastKickedPlayerId ? room.getPlayer(touchState.thirdLastTouchedPlayerId) : room.getPlayer(touchState.secondLastTouchedPlayerId)
+          assistPlayer =
+            checkForAssist &&
+            touchState.secondLastTouchedPlayerId ===
+              touchState.lastKickedPlayerId
+              ? room.getPlayer(touchState.thirdLastTouchedPlayerId)
+              : room.getPlayer(touchState.secondLastTouchedPlayerId)
           if (assistPlayer != null) {
             isOGA = assistPlayer.team.id != team
           }
         }
         const distanceText = `${touchType === 0 ? lastKickedBallDistance.toFixed(1) : lastTouchedBallDistance.toFixed(1)} m`
-        const fullGoalText = `${goalType} ${goalPlayer.name} ${goalText} (${elapsedTime})・🚀 (${speedText})${!isOG ? `・(${distanceText})` : ''}${!isOG && !isOGA && assistText ? assistText : ''}`
-        room.sendAnnouncement(fullGoalText, null, teamColor, 'bold', NotifSound.MENTION)
+        const fullGoalText = `${goalType} ${goalPlayer.name} ${goalText} (${elapsedTime})・🚀 (${speedText})${!isOG ? `・(${distanceText})` : ""}${!isOG && !isOGA && assistText ? assistText : ""}`
+        room.sendAnnouncement(
+          fullGoalText,
+          null,
+          teamColor,
+          "bold",
+          NotifSound.MENTION,
+        )
         const celebEffectWay = team == 1 ? -1 : 1
         Utils.runAfterGameTick(() => {
-          for (i = currentStartDisc; i < currentStartDisc + 3; i++) room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
+          for (i = currentStartDisc; i < currentStartDisc + 3; i++)
+            room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
           if (ENABLE_BANANA) {
-            for (i = currentStartDiscL; i < currentStartDiscL + 3; i++) room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
+            for (i = currentStartDiscL; i < currentStartDiscL + 3; i++)
+              room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
           }
           fixedBarFirstVis = false
           fixedBarPowerVis = false
-          room.setDiscProperties(0, { xgravity: 0, ygravity: 0, radius: normalBallRadius, cGroup: cf.ball, damping: 0.99 })
+          room.setDiscProperties(0, {
+            xgravity: 0,
+            ygravity: 0,
+            radius: normalBallRadius,
+            cGroup: cf.ball,
+            damping: 0.99,
+          })
           if (goalPlayer) {
             if (goalPlayer.vip && !isOG) {
               if (goalPlayer.vip >= 2) {
@@ -1669,16 +2325,18 @@ Room.create(
                 const MAX_DISCS = 87
                 const allowedChars = Object.keys(letterMap)
                 function getDiscCountForChar(char) {
-                  if (char === ' ') return 0
+                  if (char === " ") return 0
                   const lines = letterMap[char]
                   return lines ? lines.length * 2 : 0
                 }
                 function getFittingText(inputText, maxDiscs) {
                   let discTotal = 0
-                  let finalText = ''
-                  const normalizedText = replaceTurkishChars(inputText.toUpperCase())
+                  let finalText = ""
+                  const normalizedText = replaceTurkishChars(
+                    inputText.toUpperCase(),
+                  )
                   for (let char of normalizedText) {
-                    if (char !== ' ' && !allowedChars.includes(char)) continue
+                    if (char !== " " && !allowedChars.includes(char)) continue
                     const charDiscCount = getDiscCountForChar(char)
                     if (discTotal + charDiscCount > maxDiscs) break
                     finalText += char
@@ -1691,16 +2349,27 @@ Room.create(
               }
               room.setDiscProperties(0, { radius: 31, color: 0x39e600 })
               room.setPlayerDiscProperties(goalPlayer.id, { radius: 100 })
-              const players = room.players.filter((player) => !AFKSet.has(player.id))
+              const players = room.players.filter(
+                (player) => !AFKSet.has(player.id),
+              )
               if (!testGE) {
-                for (i = 0; i < players.length; i++) room.setPlayerDiscProperties(players[i].id, { xspeed: celebEffectWay * 30 })
+                for (i = 0; i < players.length; i++)
+                  room.setPlayerDiscProperties(players[i].id, {
+                    xspeed: celebEffectWay * 30,
+                  })
               } else {
                 testGEgp = goalPlayer
               }
             }
           }
-          if (touchState.secondLastTouchedPlayerId && assistPlayer !== null && !isOG && !isOGA) {
-            if (assistPlayer && assistPlayer.vip >= 2) room.setPlayerDiscProperties(assistPlayer.id, { radius: 60 })
+          if (
+            touchState.secondLastTouchedPlayerId &&
+            assistPlayer !== null &&
+            !isOG &&
+            !isOGA
+          ) {
+            if (assistPlayer && assistPlayer.vip >= 2)
+              room.setPlayerDiscProperties(assistPlayer.id, { radius: 60 })
           }
         })
         setTimeout(() => {
@@ -1709,7 +2378,11 @@ Room.create(
       }
       room.onPlayerInputChange = function (id, value) {
         const player = room.getPlayer(id)
-        if (player.team.id === 0 || player.auth === 'fake-auth-do-not-believe-it') return
+        if (
+          player.team.id === 0 ||
+          player.auth === "fake-auth-do-not-believe-it"
+        )
+          return
         if (player.pi === undefined) player.pi = 0
         if (player.rpi === undefined) player.rpi = 0
         const notr = [12, 28, 3, 19, 15, 31]
@@ -1718,30 +2391,37 @@ Room.create(
         const now = Date.now()
         const isPressingX = value >= 16
         player.secondLastXPressTimeCanBeNull = player.pressingXStartTime
-        if (isPressingX && !player.isSprinting && !player.pressingXStartTime) player.pressingXStartTime = now
+        if (isPressingX && !player.isSprinting && !player.pressingXStartTime)
+          player.pressingXStartTime = now
         else if (player.isSprinting && !isPressingX) {
           player.lastSprintDur = now - player.sprintStartTime
           player.lastSprintTime = now
           player.isSprinting = false
           Utils.runAfterGameTick(() => {
-            room.setPlayerDiscProperties(player.id, { xgravity: 0, ygravity: 0 })
+            room.setPlayerDiscProperties(player.id, {
+              xgravity: 0,
+              ygravity: 0,
+            })
           })
           player.sprintStartTime = null
           player.pressingXStartTime = null
-          room.setPlayerAvatar(player.id, '⌛', true)
+          room.setPlayerAvatar(player.id, "⌛", true)
           setTimeout(() => {
             if (player.isSprinting) return
-            room.setPlayerAvatar(player.id, '🔋', true)
+            room.setPlayerAvatar(player.id, "🔋", true)
             setTimeout(() => {
               if (player.isSprinting) return
-              if ((!player.vip || !player.ca) && player.pos != 0) room.setPlayerAvatar(player.id, String(player.pos), true)
-              else if (player.ca) room.setPlayerAvatar(player.id, player.ca, true)
+              if ((!player.vip || !player.ca) && player.pos != 0)
+                room.setPlayerAvatar(player.id, String(player.pos), true)
+              else if (player.ca)
+                room.setPlayerAvatar(player.id, player.ca, true)
               else room.setPlayerAvatar(player.id, player.avatar, true)
             }, 500)
           }, player.lastSprintDur * 5)
         } else if (!isPressingX) player.pressingXStartTime = null
         if (player.pressingXStartTime) {
-          if (player.lastXPressTime != player.pressingXStartTime) player.secondLastXPressTime = player.lastXPressTime
+          if (player.lastXPressTime != player.pressingXStartTime)
+            player.secondLastXPressTime = player.lastXPressTime
           player.lastXPressTime = now
         }
       }
@@ -1750,7 +2430,9 @@ Room.create(
         await sendJoinAnnouncements(player)
       }
       function logPlayerJoin(player) {
-        console.log(`\`🟩 F: ${player.flag} | N: ${player.name} joined the room.\``)
+        console.log(
+          `\`🟩 F: ${player.flag} | N: ${player.name} joined the room.\``,
+        )
       }
       async function sendJoinAnnouncements(player) {
         setTimeout(() => sendAnnoOnJoin(player.id, room), 1000)
@@ -1770,7 +2452,7 @@ Room.create(
         const lastTouchDuration = touchState.lastTouchDuration || 0 // Default to 0 if no touch
         touchState.lastKickedPlayerId = playerId
         const player = room.getPlayer(playerId)
-        if (player.auth === 'fake-auth-do-not-believe-it') return
+        if (player.auth === "fake-auth-do-not-believe-it") return
         updateLastTouchedPlayer(playerId, room)
         touchState.lastTouchDuration = 0 // Reset touch duration
         if (player.vip) {
@@ -1791,57 +2473,116 @@ Room.create(
         const ballSpeed = ball.speed
         const ballPos = ball.pos
         const realStadiumWidth = 13
-        const dx = (player.team.id == Team.RED ? 1 : -1) * realStadiumWidth - ballPos.x * (realStadiumWidth / stadiumWidth)
+        const dx =
+          (player.team.id == Team.RED ? 1 : -1) * realStadiumWidth -
+          ballPos.x * (realStadiumWidth / stadiumWidth)
         const dy = 0 - ballPos.y * (realStadiumWidth / stadiumWidth)
         lastKickedBallDistance = Math.sqrt(dx * dx + dy * dy)
         player.tlts = 1
         switch (player.e) {
-          case 'curve':
+          case "curve":
             let canPower = false
-            if (ENABLE_POW_AND_ULTI && lastTouchDuration > powerTimeThreshold + 0.1 && lastTouchDuration < ultiTimeThresholdStart) canPower = true
-            if (ENABLE_POW_AND_ULTI && canPower && touchState.lastTouchedPlayerId == playerId && touchState.lastOpenedBarPlayerId == playerId) {
+            if (
+              ENABLE_POW_AND_ULTI &&
+              lastTouchDuration > powerTimeThreshold + 0.1 &&
+              lastTouchDuration < ultiTimeThresholdStart
+            )
+              canPower = true
+            if (
+              ENABLE_POW_AND_ULTI &&
+              canPower &&
+              touchState.lastTouchedPlayerId == playerId &&
+              touchState.lastOpenedBarPlayerId == playerId
+            ) {
               IS_ANY_ACTIVE_EFFECT = true
               player.tlts = 5
               const powerIntensity = 1 + 0.4
               Utils.runAfterGameTick(() => {
-                room.setDiscProperties(0, { xspeed: ballSpeed.x * powerIntensity, yspeed: ballSpeed.y * powerIntensity })
+                room.setDiscProperties(0, {
+                  xspeed: ballSpeed.x * powerIntensity,
+                  yspeed: ballSpeed.y * powerIntensity,
+                })
               })
-            } else if (ENABLE_POW_AND_ULTI && lastTouchDuration > ultiTimeThresholdStart && touchState.lastTouchedPlayerId == playerId && touchState.lastOpenedBarPlayerId == playerId) {
+            } else if (
+              ENABLE_POW_AND_ULTI &&
+              lastTouchDuration > ultiTimeThresholdStart &&
+              touchState.lastTouchedPlayerId == playerId &&
+              touchState.lastOpenedBarPlayerId == playerId
+            ) {
               IS_ANY_ACTIVE_EFFECT = true
               player.tlts = 6
               ultiState.isUlti = true
               ultiState.ultiStartTime = Date.now()
               ultiState.ultiPlayer = touchState.lastTouchedPlayerId
-              const powerIntensity = 1 + Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.5, 0.3)
+              const powerIntensity =
+                1 +
+                Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.5, 0.3)
               Utils.runAfterGameTick(() => {
-                room.setDiscProperties(0, { xspeed: ballSpeed.x * powerIntensity, yspeed: ballSpeed.y * powerIntensity })
+                room.setDiscProperties(0, {
+                  xspeed: ballSpeed.x * powerIntensity,
+                  yspeed: ballSpeed.y * powerIntensity,
+                })
               })
-            } else if (!canPower && lastTouchDuration > firstTimeThreshold && touchState.lastTouchedPlayerId == playerId && touchState.lastOpenedBarPlayerId == playerId) {
-              const curveDirection = calculateCurveEffectDirection({ x: ballX, y: ballY, ...ball }, room.getPlayer(playerId))
+            } else if (
+              !canPower &&
+              lastTouchDuration > firstTimeThreshold &&
+              touchState.lastTouchedPlayerId == playerId &&
+              touchState.lastOpenedBarPlayerId == playerId
+            ) {
+              const curveDirection = calculateCurveEffectDirection(
+                { x: ballX, y: ballY, ...ball },
+                room.getPlayer(playerId),
+              )
               IS_ANY_ACTIVE_EFFECT = true
               player.tlts = 4
               curveState.isCurving = true
               curveState.curveStartTime = Date.now()
               curveState.curveDirection = curveDirection // Store the curve direction
-              curveState.curveIntensity = Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.9, 0.8) // Scale intensity by touch duration
-              const powerIntensity = 1 + Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.6, 0.6)
+              curveState.curveIntensity = Math.min(
+                lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.9,
+                0.8,
+              ) // Scale intensity by touch duration
+              const powerIntensity =
+                1 +
+                Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.6, 0.6)
               Utils.runAfterGameTick(() => {
-                room.setDiscProperties(0, { xspeed: ballSpeed.x * powerIntensity, yspeed: ballSpeed.y * powerIntensity })
+                room.setDiscProperties(0, {
+                  xspeed: ballSpeed.x * powerIntensity,
+                  yspeed: ballSpeed.y * powerIntensity,
+                })
               })
             } else {
               resetCurveState()
               resetUltiState()
               IS_ANY_ACTIVE_EFFECT = false
               Utils.runAfterGameTick(() => {
-                room.setDiscProperties(0, { xgravity: 0, ygravity: 0, radius: normalBallRadius, cGroup: cf.ball, damping: 0.99 })
+                room.setDiscProperties(0, {
+                  xgravity: 0,
+                  ygravity: 0,
+                  radius: normalBallRadius,
+                  cGroup: cf.ball,
+                  damping: 0.99,
+                })
               })
             }
             break
-          case 'lob':
+          case "lob":
             let canCurve = false
-            if (ENABLE_BANANA && lastTouchDuration > powerLobTimeThreshold + 0.1) canCurve = true
-            if (ENABLE_BANANA && canCurve && touchState.lastTouchedPlayerId == playerId && touchState.lastOpenedBarPlayerId == playerId) {
-              const curveDirection = calculateCurveEffectDirection({ x: ballX, y: ballY, ...ball }, room.getPlayer(playerId))
+            if (
+              ENABLE_BANANA &&
+              lastTouchDuration > powerLobTimeThreshold + 0.1
+            )
+              canCurve = true
+            if (
+              ENABLE_BANANA &&
+              canCurve &&
+              touchState.lastTouchedPlayerId == playerId &&
+              touchState.lastOpenedBarPlayerId == playerId
+            ) {
+              const curveDirection = calculateCurveEffectDirection(
+                { x: ballX, y: ballY, ...ball },
+                room.getPlayer(playerId),
+              )
               IS_ANY_ACTIVE_EFFECT = true
               player.tlts = 7
               lobShotState.lobShotStartTime = Date.now()
@@ -1849,31 +2590,56 @@ Room.create(
               curveState.isCurving = true
               curveState.curveStartTime = Date.now()
               curveState.curveDirection = curveDirection // Store the curve direction
-              curveState.curveIntensity = Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.8, 0.7) // Scale intensity by touch duration
-              const powerIntensity = 0.4 + Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.8, 0.7)
+              curveState.curveIntensity = Math.min(
+                lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.8,
+                0.7,
+              ) // Scale intensity by touch duration
+              const powerIntensity =
+                0.4 +
+                Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.8, 0.7)
               Utils.runAfterGameTick(() => {
-                room.setDiscProperties(0, { xspeed: ballSpeed.x * powerIntensity, yspeed: ballSpeed.y * powerIntensity })
+                room.setDiscProperties(0, {
+                  xspeed: ballSpeed.x * powerIntensity,
+                  yspeed: ballSpeed.y * powerIntensity,
+                })
               })
-            } else if (lastTouchDuration > firstTimeThreshold && touchState.lastTouchedPlayerId == playerId) {
+            } else if (
+              lastTouchDuration > firstTimeThreshold &&
+              touchState.lastTouchedPlayerId == playerId
+            ) {
               IS_ANY_ACTIVE_EFFECT = true
               player.tlts = 3
               lobShotState.lobShotStartTime = Date.now()
               lobShotState.isLobShot = true
               if (ENABLE_BANANA) {
-                const powerIntensity = 0.7 + Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.8, 0.7)
+                const powerIntensity =
+                  0.7 +
+                  Math.min(
+                    lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.8,
+                    0.7,
+                  )
                 Utils.runAfterGameTick(() => {
-                  room.setDiscProperties(0, { xspeed: ballSpeed.x * powerIntensity, yspeed: ballSpeed.y * powerIntensity })
+                  room.setDiscProperties(0, {
+                    xspeed: ballSpeed.x * powerIntensity,
+                    yspeed: ballSpeed.y * powerIntensity,
+                  })
                 })
               }
             } else {
               resetLobShotState()
               IS_ANY_ACTIVE_EFFECT = false
               Utils.runAfterGameTick(() => {
-                room.setDiscProperties(0, { xgravity: 0, ygravity: 0, radius: normalBallRadius, cGroup: cf.ball, damping: 0.99 })
+                room.setDiscProperties(0, {
+                  xgravity: 0,
+                  ygravity: 0,
+                  radius: normalBallRadius,
+                  cGroup: cf.ball,
+                  damping: 0.99,
+                })
               })
             }
             break
-          case 'none':
+          case "none":
             const team = ballSpeed.x <= 0 ? Team.RED : Team.BLUE
             const isPAtCorrectPos = true
             const goals = room.stadium.goals
@@ -1885,39 +2651,80 @@ Room.create(
             const goalYTop = -Math.abs(goal.y) - shotGap
             const tNone = (goalX - ballX) / ballSpeed.x
             const predictedYNone = ballY + ballSpeed.y * tNone
-            const isShotNone = predictedYNone <= goalYBottom && predictedYNone >= goalYTop
-            if (isPAtCorrectPos && player.team.id !== team && isShotNone && lastTouchDuration > firstTimeThreshold && touchState.lastTouchedPlayerId == playerId) {
+            const isShotNone =
+              predictedYNone <= goalYBottom && predictedYNone >= goalYTop
+            if (
+              isPAtCorrectPos &&
+              player.team.id !== team &&
+              isShotNone &&
+              lastTouchDuration > firstTimeThreshold &&
+              touchState.lastTouchedPlayerId == playerId
+            ) {
               player.tlts = 2
               const aps = room.players.filter((p) => !AFKSet.has(p.id))
               const powerIntensityRAW = aps.length > 9 ? 1.8 : 1.45
-              const powerIntensity = powerIntensityRAW + Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.8, 0.7)
+              const powerIntensity =
+                powerIntensityRAW +
+                Math.min(lastTouchDuration * CURVED_SHOT_MULTIPLIER * 0.8, 0.7)
               Utils.runAfterGameTick(() => {
-                room.setDiscProperties(0, { xspeed: ballSpeed.x * powerIntensity, yspeed: ballSpeed.y * powerIntensity })
+                room.setDiscProperties(0, {
+                  xspeed: ballSpeed.x * powerIntensity,
+                  yspeed: ballSpeed.y * powerIntensity,
+                })
               })
             }
           default:
             break
         }
       } // Check if the ball (discId 0) collided with a segment
-      room.onAfterCollisionDiscVsSegment = (discId, discPlayerId, segmentId) => {
-        if (discId === 0 && segmentId !== null && ((curveState.isCurving && !lobShotState.isLobShot) || ultiState.isUlti)) IS_ANY_ACTIVE_EFFECT = false
+      room.onAfterCollisionDiscVsSegment = (
+        discId,
+        discPlayerId,
+        segmentId,
+      ) => {
+        if (
+          discId === 0 &&
+          segmentId !== null &&
+          ((curveState.isCurving && !lobShotState.isLobShot) ||
+            ultiState.isUlti)
+        )
+          IS_ANY_ACTIVE_EFFECT = false
         const aps = room.players.filter((p) => !AFKSet.has(p.id))
-        if (discId === 0 && (segmentId === 12 || segmentId === 13) && lobShotState.isLobShot) {
-          room.sendAnnouncement(`${emojiInfo} TOP ÜST DİREKTE PATLADI.`, null, colorInfo, 'small', NotifSound.MENTION)
+        if (
+          discId === 0 &&
+          (segmentId === 12 || segmentId === 13) &&
+          lobShotState.isLobShot
+        ) {
+          room.sendAnnouncement(
+            `${emojiInfo} TOP ÜST DİREKTE PATLADI.`,
+            null,
+            colorInfo,
+            "small",
+            NotifSound.MENTION,
+          )
         }
       }
-      room.onCollisionDiscVsDisc = (discId1, discPlayerId1, discId2, discPlayerId2) => {
+      room.onCollisionDiscVsDisc = (
+        discId1,
+        discPlayerId1,
+        discId2,
+        discPlayerId2,
+      ) => {
         if (discId1 !== 0 && discId2 !== 0) return // Ignore collisions not involving the ball
         const isBallFirst = discId1 === 0 // Determine which disc is the ball and which is the player
         const playerId = isBallFirst ? discPlayerId2 : discPlayerId1
         if (room.getPlayer(playerId)) {
           updateLastTouchedPlayer(playerId, room)
-          if (touchState.lastTouchDuration < firstTimeThreshold) IS_ANY_ACTIVE_EFFECT = false // Reset active effects if the touch duration is too short
+          if (touchState.lastTouchDuration < firstTimeThreshold)
+            IS_ANY_ACTIVE_EFFECT = false // Reset active effects if the touch duration is too short
           const player = room.getPlayer(playerId)
           if (player.isSliding) player.lbkt = Date.now()
           const ball = room.getBall(true)
           const ballPos = ball.pos
-          const dx = (player.team.id == Team.RED ? 1 : -1) * (stadiumWidth * (20 / 900)) - ballPos.x * (20 / 900)
+          const dx =
+            (player.team.id == Team.RED ? 1 : -1) *
+              (stadiumWidth * (20 / 900)) -
+            ballPos.x * (20 / 900)
           const dy = 0 - ballPos.y * (20 / 900)
           lastTouchedBallDistance = Math.sqrt(dx * dx + dy * dy)
         }
@@ -1928,9 +2735,11 @@ Room.create(
         touchState.lastOpenedBarPlayerId = null
         touchState.lastKickedPlayerId = null
         Utils.runAfterGameTick(() => {
-          for (i = currentStartDisc; i < currentStartDisc + 3; i++) room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
+          for (i = currentStartDisc; i < currentStartDisc + 3; i++)
+            room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
           if (ENABLE_BANANA) {
-            for (i = currentStartDiscL; i < currentStartDiscL + 3; i++) room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
+            for (i = currentStartDiscL; i < currentStartDiscL + 3; i++)
+              room.setDiscProperties(i, { x: 0, y: 0, xspeed: 0, yspeed: 0 })
           }
         })
         fixedBarFirstVis = false
@@ -1946,7 +2755,14 @@ Room.create(
         secondSprayLineTime = null
         IS_ANY_ACTIVE_EFFECT = false
         Utils.runAfterGameTick(() => {
-          room.setDiscProperties(0, { xgravity: 0, ygravity: 0, color: 0xffffff, radius: normalBallRadius, cGroup: cf.ball, damping: 0.99 })
+          room.setDiscProperties(0, {
+            xgravity: 0,
+            ygravity: 0,
+            color: 0xffffff,
+            radius: normalBallRadius,
+            cGroup: cf.ball,
+            damping: 0.99,
+          })
         })
       }
       room.onGameStart = async function () {
@@ -1995,7 +2811,8 @@ Room.create(
         })
       }
       room.onGameTick = async function () {
-        const lastTouchPObj = room.getPlayer(touchState.lastTouchedPlayerId) || null
+        const lastTouchPObj =
+          room.getPlayer(touchState.lastTouchedPlayerId) || null
         if (lastTouchPObj) {
           const ball = room.getBall()
           touchType = isClosestPlayerTouchingBall(ball.pos, lastTouchPObj.disc)
@@ -2012,9 +2829,15 @@ Room.create(
         if (lobShotState.isLobShot) handleLobShotState(room) // Optimized curve state handling and Optimized disc color reset at below
         if (ENABLE_SPRINT_AND_SLIDE) {
           const ps = room.players.filter((p) => p.team.id !== Team.SPECTATORS)
-          ps.filter((p) => p.isSprinting).forEach((p) => handleSprintState(p, room))
-          ps.filter((p) => !p.isSprinting).forEach((p) => handleKickState(p, room))
-          ps.filter((p) => p.isSlideFriction).forEach((p) => handleSlideFriction(p, room))
+          ps.filter((p) => p.isSprinting).forEach((p) =>
+            handleSprintState(p, room),
+          )
+          ps.filter((p) => !p.isSprinting).forEach((p) =>
+            handleKickState(p, room),
+          )
+          ps.filter((p) => p.isSlideFriction).forEach((p) =>
+            handleSlideFriction(p, room),
+          )
         }
         if (testGEgp != null) testGoalEffectOrbit()
         if (parseInt(process.argv[3]) !== 1) return
