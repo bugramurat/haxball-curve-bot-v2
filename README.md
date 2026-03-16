@@ -22,7 +22,7 @@ node curve_bot_v2.js HEADLESS_TOKEN
 <br><br>
 Type **!claim** in your Haxball room to claim admin.
 <br><br><br><br>
-(You can adjust your room's name and other settings in curve_bot_v2.js file. You can use this bot with custom maps but you must create extra discs and their joints for slider-bar and arrange their ID's in curve_bot_v2.js file.)
+(You can use this bot with **custom maps** but you must create extra 6 discs and their 4 joints for slider-bar and arrange their ID's in curve_bot_v2.js file. I explained it with details, check curve_bot_v2.js file.)
 
 ## Features
 - Adjustable curve direction
