@@ -53,6 +53,19 @@ let needToLockTeams = true
 const testGE = true // Leave true if you want to see a cool goal effect
 let GOAL_TEXT = "HELLYEAH"
 
+//------------------------ ABILITY CONFIG -----------------------------------------
+let ENABLE_SPRINT_AND_SLIDE = true // Enable sprint and slide
+let ENABLE_BANANA = true // Enable curved cross for lob-shot
+let ENABLE_POW_AND_ULTI = true // Enable hard-power-shot and controllable-shot for curved-shot
+let SPRINT_DUR = 1000 // Sprint duration
+let OP_DUR = 10000 // OP-mode-sprint duration
+
+const CURVED_SHOT_MULTIPLIER = 0.25 // Multiplies the ball's curve for curved shots
+const CURVED_SHOT_DURATION = 1.6 // Curved shot duration in seconds
+
+//------------------------ STADIUM CONFIG -----------------------------------------
+const STADIUM_PATH_F = "fx4.hbs" // Make sure your custom stadium have enough discs for slider-bar, and don't forget to edit disc ID's below
+
 //------------------------ KIT CONFIG -----------------------------------------
 const kitsInfo =
   "[0] City, [1] Real (Alt), [2] Fener, [3] Galata, [4] Beşiktaş, [5] Kocaeli, [6] Barça, [7] Manu, [8] Inter, [9] Paris, [10] Miami, [11] Al Nassr, [12] Milan, [13] Liverpool, [14] Dortmund, [15] Chelsea, [16] Juventus, [17] Leverkusen, [18] Roma, [19] Bursa, [20] Spain, [21] Portugal, [22] Spain (A), [23] Eyüp, [24] Paris (A), [25] Real (Alt2), [26] Real" // VIP's can see this with !s or !shirts command
@@ -125,16 +138,6 @@ let homeTeam = Math.floor(Math.random() * dbKits.length)
 let awayTeam
 do awayTeam = Math.floor(Math.random() * dbKits.length)
 while (homeTeam === awayTeam)
-
-//------------------------ ABILITY CONFIG -----------------------------------------
-const CURVED_SHOT_MULTIPLIER = 0.25 // Multiplies the ball's curve for curved shots
-const CURVED_SHOT_DURATION = 1.6 // Curved shot duration in seconds
-let ENABLE_SPRINT_AND_SLIDE = true
-let ENABLE_BANANA = true
-let ENABLE_POW_AND_ULTI = true
-
-//------------------------ STADIUM CONFIG -----------------------------------------
-const STADIUM_PATH_F = "fx4.hbs" // Make sure your custom stadium have enough discs for slider-bar
 
 /*
     ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -462,7 +465,7 @@ function handleSprintState(player, room) {
       room.setPlayerDiscProperties(player.id, props)
     })
   }
-  const durLimit = player.op ? 10000 : 1000
+  const durLimit = player.op ? OP_DUR : SPRINT_DUR
   if (!isSpeedThresholdOkay || now - player.sprintStartTime >= durLimit) {
     player.lastSprintDur = now - player.sprintStartTime
     player.lastSprintTime = now
