@@ -14,7 +14,6 @@ cd haxball-curve-bot-v2
 Install dependecies:
 ```
 npm install
-npm install node-haxball
 ```
 **Paste your token** while executing *curve_bot_v2.js* file in your cmd and run the bot *(https://www.haxball.com/headlesstoken)*:
 ```
