@@ -64,7 +64,24 @@ const CURVED_SHOT_MULTIPLIER = 0.25 // Multiplies the ball's curve for curved sh
 const CURVED_SHOT_DURATION = 1.6 // Curved shot duration in seconds
 
 //------------------------ STADIUM CONFIG -----------------------------------------
-const STADIUM_PATH_F = "fx4.hbs" // Make sure your custom stadium have enough discs for slider-bar, and don't forget to edit disc ID's below
+const STADIUM_PATH_F = "fx4.hbs" // Make sure your custom stadium have enough discs and joints for slider-bar, and don't forget to edit disc ID's below
+var currentStartDisc = 9 // Slider-bar first disc ID for curve-shot. Make sure you edited this disc id for your custom map
+var currentStartDiscL = 104 // Slider-bar first disc ID for lob-shot. Make sure you edited this disc id for your custom map
+
+// Simply add 6 discs to your custom map and connect them with 4 joints them like below. Please adjust disc ID's with your map, otherwise it will give an error
+/*
+		{ "radius" : 0, "pos" : [-1000,-1000 ], "cGroup" : ["c2" ] }, // 9
+		{ "radius" : 0, "pos" : [-1000,-1000 ], "cGroup" : ["c2" ] }, // 10
+		{ "radius" : 0, "pos" : [-1000,-1000 ], "cGroup" : ["c2" ] }, // 11
+		{ "radius" : 0, "pos" : [-1000,-1000 ], "cGroup" : ["c2" ] }, // 104
+		{ "radius" : 0, "pos" : [-1000,-1000 ], "cGroup" : ["c2" ] }, // 105
+		{ "radius" : 0, "pos" : [-1000,-1000 ], "cGroup" : ["c2" ] }, // 106
+
+		{ "d0" : 9, "d1" : 10, "strength" : 0.000002, "color" : "000000", "length" : null },
+		{ "d0" : 9, "d1" : 11, "strength" : 0.000002, "color" : "ffffff", "length" : null },
+		{ "d0" : 104, "d1" : 105, "strength" : 0.000002, "color" : "000000", "length" : null },
+		{ "d0" : 104, "d1" : 106, "strength" : 0.000002, "color" : "FFFF00", "length" : null }
+*/
 
 //------------------------ KIT CONFIG -----------------------------------------
 const kitsInfo =
@@ -190,8 +207,6 @@ const discordString = `For bot and map requests --> Discord: buggyraz`
 const annoList = [{ s: discordString, c: colorDiscord }]
 let annoIndex = 0
 const Team = { SPECTATORS: 0, RED: 1, BLUE: 2 }
-var currentStartDisc = 9 // Make sure you edited this disc id for your custom map
-var currentStartDiscL = 104 // Make sure you edited this disc id for your custom map
 var AFKSet = new Set()
 const Role = { PLAYER: 0, VIP: 1, VIP_PLUS: 2, MOD: 3, MASTER: 4 }
 const NotifSound = { NONE: 0, CHAT: 1, MENTION: 2 }
