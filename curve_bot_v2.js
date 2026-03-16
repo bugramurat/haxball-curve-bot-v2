@@ -57,8 +57,8 @@ let GOAL_TEXT = "HELLYEAH"
 let ENABLE_SPRINT_AND_SLIDE = true // Enable sprint and slide
 let ENABLE_BANANA = true // Enable curved cross for lob-shot
 let ENABLE_POW_AND_ULTI = true // Enable hard-power-shot and controllable-shot for curved-shot
-let SPRINT_DUR = 1000 // Sprint duration
-let OP_DUR = 10000 // OP-mode-sprint duration
+let SPRINT_DUR = 1000 // Sprint duration (1s)
+let OP_DUR = 10000 // OP-mode-sprint duration (10s)
 
 const CURVED_SHOT_MULTIPLIER = 0.25 // Multiplies the ball's curve for curved shots
 const CURVED_SHOT_DURATION = 1.6 // Curved shot duration in seconds
