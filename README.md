@@ -9,7 +9,7 @@ Haxball curve bot (adjustable direction) with slider-bar (also including Lob-sho
 Run this to **download** this project *(or download manually and go to your project-folder path)*:
 ```
 git clone https://github.com/bugramurat/haxball-curve-bot-v2.git
-cd haxball-curve-bot-v2
+cd haxball-curve-bot-v2-main
 ```
 Install dependecies:
 ```
